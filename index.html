@@ -1,0 +1,1570 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Module 1 | First-Order Sensor Response</title>
+
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+<link rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+
+<script defer
+src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+
+<style>
+:root {
+  --dark: #064e3b;
+  --primary: #047857;
+  --green: #059669;
+  --light: #ecfdf5;
+  --background: #f3faf6;
+  --border: #d1e7db;
+  --text: #173d30;
+  --muted: #647d70;
+  --white: #ffffff;
+  --red: #b91c1c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: var(--background);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+header {
+  background: linear-gradient(
+    120deg,
+    #064e3b,
+    #047857,
+    #059669
+  );
+  color: white;
+  padding: 38px 24px;
+}
+
+.container {
+  max-width: 1250px;
+  margin: auto;
+}
+
+header h1 {
+  margin: 0 0 8px;
+  font-size: clamp(25px, 3vw, 37px);
+}
+
+header p {
+  color: #d1fae5;
+  margin: 4px 0;
+}
+
+main {
+  padding: 25px 20px 50px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.sidebar {
+  position: sticky;
+  top: 15px;
+}
+
+.content {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+
+.card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  padding: 23px;
+  margin-bottom: 18px;
+  box-shadow: 0 5px 18px rgba(6,78,59,.05);
+}
+
+.content .card {
+  margin-bottom: 0;
+}
+
+h2, h3 {
+  color: var(--dark);
+  margin-top: 0;
+}
+
+h2 {
+  font-size: 21px;
+  margin-bottom: 8px;
+}
+
+h3 {
+  font-size: 16px;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.control {
+  margin-bottom: 25px;
+}
+
+.control-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.value {
+  background: var(--light);
+  color: var(--primary);
+  padding: 4px 11px;
+  border-radius: 7px;
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--green);
+  cursor: pointer;
+}
+
+.mode-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 5px;
+  background: var(--light);
+  border-radius: 10px;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.mode-buttons button {
+  border: 0;
+  background: transparent;
+  padding: 12px 8px;
+  border-radius: 8px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.mode-buttons button.active {
+  background: var(--primary);
+  color: white;
+}
+
+.btn {
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  background: white;
+  border-radius: 9px;
+  padding: 11px 16px;
+  font-weight: 700;
+}
+
+.btn:hover {
+  background: var(--light);
+}
+
+.btn.primary {
+  background: var(--dark);
+  color: white;
+}
+
+.btn.primary:hover {
+  background: var(--primary);
+}
+
+.btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.full {
+  width: 100%;
+}
+
+.info {
+  background: var(--light);
+  border-left: 4px solid var(--green);
+  border-radius: 8px;
+  padding: 13px 15px;
+  font-size: 14px;
+}
+
+.equations {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.equation-box {
+  background: var(--light);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 10px;
+  text-align: center;
+  overflow-x: auto;
+}
+
+.equation-box small {
+  display: block;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 17px;
+}
+
+.stat {
+  background: var(--light);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--green);
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.stat-label {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.stat-value {
+  font-size: 21px;
+  font-weight: 800;
+  color: var(--dark);
+  margin: 5px 0;
+}
+
+.stat-note {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.plot {
+  width: 100%;
+  height: 420px;
+}
+
+.caption {
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 12px;
+}
+
+.prediction {
+  background: var(--light);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.question {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 14px 0;
+}
+
+.answers {
+  display: grid;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.answer {
+  text-align: left;
+  border: 2px solid var(--border);
+  border-radius: 9px;
+  padding: 13px 15px;
+  background: white;
+  color: var(--text);
+}
+
+.answer.selected {
+  border-color: var(--primary);
+  background: #d1fae5;
+}
+
+.answer.correct {
+  border-color: var(--primary);
+  background: #d1fae5;
+}
+
+.answer.wrong {
+  border-color: var(--red);
+  background: #fff1f2;
+}
+
+.feedback {
+  display: none;
+  margin-top: 15px;
+  padding: 14px;
+  border-radius: 8px;
+  background: white;
+  border-left: 4px solid var(--green);
+}
+
+.feedback.visible {
+  display: block;
+}
+
+.feedback.error {
+  border-color: var(--red);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th {
+  background: var(--dark);
+  color: white;
+  text-align: left;
+  padding: 13px;
+}
+
+td {
+  padding: 13px;
+  border-bottom: 1px solid var(--border);
+}
+
+.status {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 700;
+}
+
+.pass {
+  background: #d1fae5;
+  color: #047857;
+}
+
+.fail {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+footer {
+  text-align: center;
+  color: var(--muted);
+  padding: 25px;
+  font-size: 13px;
+}
+
+@media(max-width: 1000px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media(max-width: 650px) {
+  .equations {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .plot {
+    height: 350px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="container">
+    <h1>First-Order Sensor Response Simulator</h1>
+    <p>Dynamic Characteristics Interactive Toolkit</p>
+    <p>Module 1 — ENCS4380 Interfacing Techniques</p>
+    <p>Birzeit University</p>
+  </div>
+</header>
+
+<main class="container">
+
+<div class="layout">
+
+<aside class="sidebar">
+
+<section class="card">
+
+  <h2>Simulation Controls</h2>
+
+  <p class="subtitle">
+    Move the sliders to see the sensor response
+    update instantly.
+  </p>
+
+  <div class="control">
+    <div class="control-top">
+      <label for="gainSlider">Sensor Gain (K)</label>
+      <span class="value" id="gainValue">2.0</span>
+    </div>
+
+    <input
+      type="range"
+      id="gainSlider"
+      min="0.5"
+      max="5"
+      step="0.1"
+      value="2">
+  </div>
+
+  <div class="control">
+    <div class="control-top">
+      <label for="tauSlider">Time Constant (τ)</label>
+      <span class="value" id="tauValue">2.0 s</span>
+    </div>
+
+    <input
+      type="range"
+      id="tauSlider"
+      min="0.5"
+      max="5"
+      step="0.1"
+      value="2">
+  </div>
+
+  <div class="control">
+    <div class="control-top">
+      <span>Input Signal</span>
+    </div>
+
+    <div class="mode-buttons">
+      <button id="stepButton" class="active">
+        Step
+      </button>
+
+      <button id="rampButton">
+        Ramp
+      </button>
+    </div>
+  </div>
+
+  <button class="btn full" id="resetButton">
+    Reset Simulation
+  </button>
+
+</section>
+
+<section class="card">
+  <h3>Understanding τ</h3>
+
+  <p class="caption">
+    The time constant controls how quickly a
+    first-order sensor responds.
+  </p>
+
+  <div class="info">
+    At t = τ, a step response reaches 63.2%
+    of its final value.
+
+    At t = 3τ, it reaches approximately 95%.
+  </div>
+</section>
+
+</aside>
+
+<div class="content">
+
+<section class="card">
+
+<h2>1. Mathematical Model</h2>
+
+<p class="subtitle">
+  First-order sensor model with zero initial conditions.
+</p>
+
+<div class="equations">
+
+  <div class="equation-box">
+    <small>Differential Equation</small>
+    <div id="equation1">
+      τ dy/dt + y = Kx(t)
+    </div>
+  </div>
+
+  <div class="equation-box">
+    <small>Transfer Function</small>
+    <div id="equation2">
+      G(s) = K/(τs+1)
+    </div>
+  </div>
+
+  <div class="equation-box">
+    <small id="solutionLabel">
+      Step Response
+    </small>
+
+    <div id="equation3">
+      y(t) = K(1-e^(-t/τ))
+    </div>
+  </div>
+
+</div>
+
+</section>
+
+<section class="card">
+
+<h2 id="responseHeading">
+  2. Step Response
+</h2>
+
+<p class="subtitle" id="responseDescription">
+  Response to a unit step input.
+</p>
+
+<div class="stats" id="responseStats"></div>
+
+<div class="plot" id="responsePlot"></div>
+
+<p class="caption" id="responseCaption"></p>
+
+</section>
+
+<section class="card">
+
+<h2>3. Logarithmic Error Analysis</h2>
+
+<p class="subtitle">
+  The normalized transient error is
+  E(t) = exp(-t/τ).
+</p>
+
+<div class="stats" id="errorStats"></div>
+
+<div class="plot" id="errorPlot"></div>
+
+<p class="caption">
+  The vertical axis is logarithmic (base 10).
+  The slope of ln(E) versus time is −1/τ.
+  On the log10 graph, the slope is
+  −1/(τ ln 10).
+</p>
+
+</section>
+
+<section class="card">
+
+<h2>4. Predict, Then Check</h2>
+
+<p class="subtitle">
+  Predict the effect of changing a parameter,
+  then use the sliders above to verify your answer.
+</p>
+
+<div class="prediction">
+
+  <div class="info" id="changeDescription">
+    Think about the effect of changing K or τ.
+  </div>
+
+  <div class="question" id="predictionQuestion">
+    What do you expect to happen?
+  </div>
+
+  <div class="answers" id="predictionAnswers"></div>
+
+  <div class="actions">
+    <button class="btn primary" id="checkPrediction">
+      Check Prediction
+    </button>
+
+    <button class="btn" id="nextQuestion">
+      Next Question
+    </button>
+  </div>
+
+  <div class="feedback" id="predictionFeedback"></div>
+
+</div>
+
+</section>
+
+<section class="card">
+
+<h2>5. Validation Tests</h2>
+
+<p class="subtitle">
+  Required first-order step-response
+  reference checks.
+</p>
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+<tr>
+  <th>Validation Test</th>
+  <th>Expected</th>
+  <th>Calculated</th>
+  <th>Status</th>
+</tr>
+</thead>
+
+<tbody id="validationTable"></tbody>
+
+</table>
+
+</div>
+
+<p class="caption">
+  The checks use a unit step input (A = 1).
+  The expected values are 0.632KA at t = τ
+  and 0.95KA at t = 3τ.
+</p>
+
+</section>
+
+</div>
+</div>
+
+</main>
+
+<footer>
+  ENCS4380 — Dynamic Characteristics Toolkit
+  | Module 1
+</footer>
+
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+
+const COLORS = {
+  green: "#059669",
+  dark: "#064e3b",
+  primary: "#047857",
+  grey: "#94b8a7",
+  grid: "#d1e7db"
+};
+
+const MAX_TIME = 30;
+const STEP_Y_MAX = 5.5;
+const RAMP_Y_MAX = 155;
+
+let current = {
+  K: 2,
+  tau: 2,
+  mode: "step"
+};
+
+let selectedPrediction = null;
+let predictionChecked = false;
+let activeQuestion = null;
+let questionIndex = 0;
+
+// --------------------------------------
+// Mathematical functions
+// --------------------------------------
+
+function stepResponse(t,K,tau) {
+  return K*(1-Math.exp(-t/tau));
+}
+
+function rampResponse(t,K,tau) {
+  return K*(t-tau+tau*Math.exp(-t/tau));
+}
+
+function errorFraction(t,tau) {
+  return Math.exp(-t/tau);
+}
+
+function fmt(number) {
+  return Number(number).toFixed(4);
+}
+
+function makeTimeArray(max,count=500) {
+  return Array.from(
+    {length:count},
+    (_,i) => max*i/(count-1)
+  );
+}
+
+// --------------------------------------
+// Mathematical equations
+// --------------------------------------
+
+function showMath(id,formula) {
+  if(window.katex) {
+    katex.render(formula,$(id),{
+      throwOnError:false
+    });
+  } else {
+    $(id).textContent = formula;
+  }
+}
+
+function updateEquations() {
+  showMath(
+    "equation1",
+    "\\tau\\frac{dy}{dt}+y=Kx(t)"
+  );
+
+  showMath(
+    "equation2",
+    "G(s)=\\frac{K}{\\tau s+1}"
+  );
+
+  if(current.mode==="step") {
+    $("solutionLabel").textContent =
+      "Step Response";
+
+    showMath(
+      "equation3",
+      "y(t)=K(1-e^{-t/\\tau})"
+    );
+  } else {
+    $("solutionLabel").textContent =
+      "Ramp Response";
+
+    showMath(
+      "equation3",
+      "y(t)=K(t-\\tau+\\tau e^{-t/\\tau})"
+    );
+  }
+}
+
+// --------------------------------------
+// Statistic cards
+// --------------------------------------
+
+function showStats(containerId,items) {
+  $(containerId).innerHTML = items.map(item => `
+    <div class="stat">
+      <div class="stat-label">${item.label}</div>
+      <div class="stat-value">${item.value}</div>
+      <div class="stat-note">${item.note}</div>
+    </div>
+  `).join("");
+}
+
+// --------------------------------------
+// Plot configuration
+// --------------------------------------
+
+function baseLayout(yTitle,yRange) {
+  return {
+    paper_bgcolor:"#ffffff",
+    plot_bgcolor:"#ffffff",
+
+    font:{
+      family:"Segoe UI, Arial",
+      color:COLORS.dark
+    },
+
+    margin:{
+      l:70,
+      r:25,
+      t:25,
+      b:85
+    },
+
+    xaxis:{
+      title:"Time (s)",
+      range:[0,MAX_TIME],
+      autorange:false,
+      gridcolor:COLORS.grid,
+      zeroline:false
+    },
+
+    yaxis:{
+      title:yTitle,
+      range:yRange,
+      autorange:false,
+      gridcolor:COLORS.grid,
+      zeroline:false
+    },
+
+    legend:{
+      orientation:"h",
+      x:0,
+      y:-0.28
+    },
+
+    hovermode:"closest"
+  };
+}
+
+const plotConfig = {
+  responsive:true,
+  displaylogo:false
+};
+
+// --------------------------------------
+// Response plot
+// --------------------------------------
+
+function drawResponse() {
+  const {K,tau,mode} = current;
+
+  const t = makeTimeArray(MAX_TIME);
+
+  let traces = [];
+  let layout;
+
+  if(mode==="step") {
+
+    const output = t.map(
+      x => stepResponse(x,K,tau)
+    );
+
+    const point1 = stepResponse(tau,K,tau);
+    const point3 = stepResponse(3*tau,K,tau);
+
+    traces = [
+      {
+        x:[0,MAX_TIME],
+        y:[K,K],
+        name:"Final Value K",
+        mode:"lines",
+        line:{
+          color:COLORS.grey,
+          dash:"dash",
+          width:2
+        }
+      },
+
+      {
+        x:t,
+        y:output,
+        name:"Sensor Output",
+        mode:"lines",
+        line:{
+          color:COLORS.green,
+          width:4
+        }
+      },
+
+      {
+        x:[tau,3*tau],
+        y:[point1,point3],
+        name:"Characteristic Points",
+        mode:"markers+text",
+        text:["63.2%","95%"],
+        textposition:"top center",
+        marker:{
+          color:COLORS.dark,
+          size:11
+        }
+      }
+    ];
+
+    layout = baseLayout(
+      "Output Amplitude",
+      [0,STEP_Y_MAX]
+    );
+
+    layout.shapes = [
+      {
+        type:"line",
+        x0:tau,
+        x1:tau,
+        y0:0,
+        y1:point1,
+        line:{
+          color:COLORS.primary,
+          dash:"dot"
+        }
+      },
+      {
+        type:"line",
+        x0:3*tau,
+        x1:3*tau,
+        y0:0,
+        y1:point3,
+        line:{
+          color:COLORS.primary,
+          dash:"dot"
+        }
+      }
+    ];
+
+    showStats("responseStats",[
+      {
+        label:"Final Output",
+        value:fmt(K),
+        note:"y(∞) = K"
+      },
+      {
+        label:"At t = τ",
+        value:fmt(point1),
+        note:"63.2% of K"
+      },
+      {
+        label:"At t = 3τ",
+        value:fmt(point3),
+        note:"Approximately 95%"
+      },
+      {
+        label:"Steady-State Error",
+        value:"0",
+        note:"Relative to K"
+      }
+    ]);
+
+    $("responseHeading").textContent =
+      "2. Step Response";
+
+    $("responseDescription").textContent =
+      "Unit step input: x(t) = 1 for t ≥ 0.";
+
+    $("responseCaption").textContent =
+      "The step response approaches the final " +
+      "value K. The markers show the response " +
+      "at one and three time constants.";
+
+  } else {
+
+    const output = t.map(
+      x => rampResponse(x,K,tau)
+    );
+
+    const ideal = t.map(x => K*x);
+
+    const asymptote = t.map(
+      x => x>=tau ? K*(x-tau) : null
+    );
+
+    const markerTime = 5*tau;
+
+    const idealAtMarker = K*markerTime;
+
+    const actualAtMarker =
+      rampResponse(markerTime,K,tau);
+
+    traces = [
+      {
+        x:t,
+        y:ideal,
+        name:"Ideal Output Kt",
+        mode:"lines",
+        line:{
+          color:COLORS.grey,
+          dash:"dash",
+          width:2
+        }
+      },
+
+      {
+        x:t,
+        y:asymptote,
+        name:"Steady-State Asymptote",
+        mode:"lines",
+        line:{
+          color:COLORS.primary,
+          dash:"dot",
+          width:2
+        }
+      },
+
+      {
+        x:t,
+        y:output,
+        name:"Sensor Output",
+        mode:"lines",
+        line:{
+          color:COLORS.green,
+          width:4
+        }
+      },
+
+      {
+        x:[markerTime,markerTime],
+        y:[actualAtMarker,idealAtMarker],
+        name:"Tracking Error at 5τ",
+        mode:"lines+markers",
+        line:{
+          color:COLORS.dark,
+          width:3
+        },
+        marker:{
+          size:8
+        }
+      }
+    ];
+
+    layout = baseLayout(
+      "Output Amplitude",
+      [0,RAMP_Y_MAX]
+    );
+
+    layout.annotations = [
+      {
+        x:tau,
+        y:0,
+        text:"Lag = τ",
+        showarrow:true,
+        arrowhead:2,
+        ax:45,
+        ay:-45,
+        font:{color:COLORS.dark}
+      }
+    ];
+
+    showStats("responseStats",[
+      {
+        label:"Time Lag",
+        value:tau.toFixed(2)+" s",
+        note:"Lag = τ"
+      },
+      {
+        label:"Steady-State Error",
+        value:fmt(K*tau),
+        note:"Kτ"
+      },
+      {
+        label:"Output Slope",
+        value:K.toFixed(2),
+        note:"Asymptotic slope"
+      },
+      {
+        label:"Error at 5τ",
+        value:fmt(
+          idealAtMarker-actualAtMarker
+        ),
+        note:"Approaches Kτ"
+      }
+    ]);
+
+    $("responseHeading").textContent =
+      "2. Ramp Response";
+
+    $("responseDescription").textContent =
+      "Unit ramp input: x(t) = t for t ≥ 0.";
+
+    $("responseCaption").textContent =
+      "The ramp response approaches a line " +
+      "delayed by τ seconds. Its steady-state " +
+      "tracking error relative to Kt is Kτ.";
+  }
+
+  Plotly.react(
+    "responsePlot",
+    traces,
+    layout,
+    plotConfig
+  );
+}
+
+// --------------------------------------
+// Logarithmic error plot
+// --------------------------------------
+
+function drawErrorPlot() {
+  const tau = current.tau;
+
+  const t = makeTimeArray(MAX_TIME,400);
+
+  const e = t.map(
+    x => errorFraction(x,tau)
+  );
+
+  const traces = [
+    {
+      x:t,
+      y:e,
+      name:"Normalized Error",
+      mode:"lines",
+      line:{
+        color:COLORS.green,
+        width:4
+      }
+    },
+
+    {
+      x:[tau,3*tau],
+      y:[Math.exp(-1),Math.exp(-3)],
+      name:"Reference Points",
+      mode:"markers+text",
+      text:["36.8%","4.98%"],
+      textposition:"top right",
+      marker:{
+        color:COLORS.dark,
+        size:10
+      }
+    }
+  ];
+
+  const layout = baseLayout(
+    "Normalized Error (log10)",
+    undefined
+  );
+
+  layout.yaxis = {
+    title:"Normalized Error (log10)",
+    type:"log",
+    range:[-14,0.2],
+    autorange:false,
+    gridcolor:COLORS.grid
+  };
+
+  Plotly.react(
+    "errorPlot",
+    traces,
+    layout,
+    plotConfig
+  );
+
+  showStats("errorStats",[
+    {
+      label:"Time Constant",
+      value:tau.toFixed(2)+" s",
+      note:"τ"
+    },
+    {
+      label:"Natural Log Slope",
+      value:fmt(-1/tau),
+      note:"−1/τ"
+    },
+    {
+      label:"Error at τ",
+      value:"36.79%",
+      note:"Remaining error"
+    },
+    {
+      label:"Error at 3τ",
+      value:"4.98%",
+      note:"Remaining error"
+    }
+  ]);
+}
+
+// --------------------------------------
+// Validation
+// --------------------------------------
+
+function updateValidation() {
+  const {K,tau} = current;
+
+  const tests = [
+    {
+      name:"Step response at t = τ",
+      expected:0.632*K,
+      actual:stepResponse(tau,K,tau)
+    },
+    {
+      name:"Step response at t = 3τ",
+      expected:0.95*K,
+      actual:stepResponse(3*tau,K,tau)
+    }
+  ];
+
+  const tolerance = 0.001*K;
+
+  $("validationTable").innerHTML =
+    tests.map(test => {
+
+      const passed =
+        Math.abs(test.expected-test.actual)
+        <= tolerance;
+
+      return `
+        <tr>
+          <td>${test.name}</td>
+          <td>${fmt(test.expected)}</td>
+          <td>${fmt(test.actual)}</td>
+          <td>
+            <span class="status ${passed?"pass":"fail"}">
+              ${passed?"PASS":"FAIL"}
+            </span>
+          </td>
+        </tr>
+      `;
+    }).join("");
+}
+
+// --------------------------------------
+// Predict Then Check
+// --------------------------------------
+
+function shuffle(array) {
+  const result = [...array];
+
+  for(let i=result.length-1;i>0;i--) {
+    const j = Math.floor(
+      Math.random()*(i+1)
+    );
+
+    [result[i],result[j]] =
+      [result[j],result[i]];
+  }
+
+  return result;
+}
+
+const questions = [
+  {
+    change:"Imagine increasing τ while K stays constant.",
+    question:"What happens to the response speed?",
+    options:[
+      {text:"It becomes slower",correct:true},
+      {text:"It becomes faster",correct:false},
+      {text:"It stays unchanged",correct:false}
+    ],
+    explanation:
+      "Increasing τ makes a first-order response slower."
+  },
+  {
+    change:"Imagine decreasing τ while K stays constant.",
+    question:"What happens to the response speed?",
+    options:[
+      {text:"It becomes slower",correct:false},
+      {text:"It becomes faster",correct:true},
+      {text:"It stops responding",correct:false}
+    ],
+    explanation:
+      "Decreasing τ makes the sensor respond faster."
+  },
+  {
+    change:"Imagine increasing K while τ stays constant.",
+    question:"What happens to the step final value?",
+    options:[
+      {text:"It increases",correct:true},
+      {text:"It decreases",correct:false},
+      {text:"It stays unchanged",correct:false}
+    ],
+    explanation:
+      "For a unit step, the final value is K."
+  },
+  {
+    change:"Consider a unit step response.",
+    question:"How much of the final value is reached at t = τ?",
+    options:[
+      {text:"About 95%",correct:false},
+      {text:"About 63.2%",correct:true},
+      {text:"Exactly 100%",correct:false}
+    ],
+    explanation:
+      "At one time constant, the response reaches 1 − e⁻¹ = 63.2%."
+  },
+  {
+    change:"Consider a unit step response.",
+    question:"How much of the final value is reached at t = 3τ?",
+    options:[
+      {text:"About 95%",correct:true},
+      {text:"About 63.2%",correct:false},
+      {text:"About 20%",correct:false}
+    ],
+    explanation:
+      "At three time constants, 1 − e⁻³ ≈ 95%."
+  },
+  {
+    change:"Consider a first-order unit ramp response.",
+    question:"What is the steady-state time lag?",
+    options:[
+      {text:"K seconds",correct:false},
+      {text:"τ seconds",correct:true},
+      {text:"Zero seconds",correct:false}
+    ],
+    explanation:
+      "The ramp response approaches the ideal output delayed by τ seconds."
+  },
+  {
+    change:"Consider a unit ramp response.",
+    question:"What is the steady-state tracking error relative to Kt?",
+    options:[
+      {text:"Kτ",correct:true},
+      {text:"K/τ",correct:false},
+      {text:"Zero",correct:false}
+    ],
+    explanation:
+      "For a unit ramp, the steady-state tracking error is Kτ."
+  },
+  {
+    change:"Consider the normalized step transient error.",
+    question:"What is the slope of ln(E) versus time?",
+    options:[
+      {text:"−τ",correct:false},
+      {text:"−1/τ",correct:true},
+      {text:"Kτ",correct:false}
+    ],
+    explanation:
+      "Since E(t) = e^(−t/τ), ln(E) = −t/τ."
+  }
+];
+
+let questionOrder = shuffle(
+  questions.map((_,i) => i)
+);
+
+function loadQuestion() {
+
+  if(questionIndex>=questionOrder.length) {
+    questionIndex = 0;
+    questionOrder = shuffle(
+      questions.map((_,i) => i)
+    );
+  }
+
+  activeQuestion =
+    questions[questionOrder[questionIndex]];
+
+  selectedPrediction = null;
+  predictionChecked = false;
+
+  $("changeDescription").textContent =
+    activeQuestion.change;
+
+  $("predictionQuestion").textContent =
+    activeQuestion.question;
+
+  $("predictionAnswers").innerHTML = "";
+
+  const options = shuffle(activeQuestion.options);
+
+  activeQuestion.displayOptions = options;
+
+  options.forEach((option,index) => {
+
+    const button =
+      document.createElement("button");
+
+    button.className = "answer";
+    button.textContent = option.text;
+
+    button.addEventListener("click",() => {
+
+      if(predictionChecked) return;
+
+      selectedPrediction = {
+        index,
+        correct:option.correct
+      };
+
+      document.querySelectorAll(".answer")
+        .forEach((b,i) => {
+          b.classList.toggle(
+            "selected",
+            i===index
+          );
+        });
+    });
+
+    $("predictionAnswers").appendChild(button);
+  });
+
+  $("predictionFeedback").className =
+    "feedback";
+
+  $("predictionFeedback").textContent = "";
+
+  $("checkPrediction").disabled = false;
+}
+
+function checkPrediction() {
+
+  if(selectedPrediction===null) {
+    $("predictionFeedback").className =
+      "feedback visible error";
+
+    $("predictionFeedback").textContent =
+      "Please select an answer first.";
+
+    return;
+  }
+
+  predictionChecked = true;
+
+  document.querySelectorAll(".answer")
+    .forEach((button,index) => {
+
+      button.disabled = true;
+
+      if(
+        activeQuestion.displayOptions[index].correct
+      ) {
+        button.classList.add("correct");
+      } else if(index===selectedPrediction.index) {
+        button.classList.add("wrong");
+      }
+    });
+
+  const correct =
+    selectedPrediction.correct;
+
+  $("predictionFeedback").className =
+    "feedback visible" +
+    (correct?"":" error");
+
+  $("predictionFeedback").textContent =
+    (correct?"Correct! ":"Not quite. ") +
+    activeQuestion.explanation;
+
+  $("checkPrediction").disabled = true;
+}
+
+// --------------------------------------
+// Update controls
+// --------------------------------------
+
+function updateControls() {
+
+  $("gainValue").textContent =
+    current.K.toFixed(1);
+
+  $("tauValue").textContent =
+    current.tau.toFixed(1)+" s";
+
+  $("stepButton").classList.toggle(
+    "active",
+    current.mode==="step"
+  );
+
+  $("rampButton").classList.toggle(
+    "active",
+    current.mode==="ramp"
+  );
+}
+
+// --------------------------------------
+// Update simulation instantly
+// --------------------------------------
+
+function updateSimulation() {
+  updateControls();
+  updateEquations();
+  drawResponse();
+  drawErrorPlot();
+  updateValidation();
+}
+
+// --------------------------------------
+// Event listeners
+// --------------------------------------
+
+$("gainSlider").addEventListener(
+  "input",
+  event => {
+    current.K = Number(event.target.value);
+    updateSimulation();
+  }
+);
+
+$("tauSlider").addEventListener(
+  "input",
+  event => {
+    current.tau = Number(event.target.value);
+    updateSimulation();
+  }
+);
+
+$("stepButton").addEventListener(
+  "click",
+  () => {
+    current.mode = "step";
+    updateSimulation();
+  }
+);
+
+$("rampButton").addEventListener(
+  "click",
+  () => {
+    current.mode = "ramp";
+    updateSimulation();
+  }
+);
+
+$("checkPrediction").addEventListener(
+  "click",
+  checkPrediction
+);
+
+$("nextQuestion").addEventListener(
+  "click",
+  () => {
+    questionIndex++;
+    loadQuestion();
+  }
+);
+
+$("resetButton").addEventListener(
+  "click",
+  () => {
+
+    current = {
+      K:2,
+      tau:2,
+      mode:"step"
+    };
+
+    $("gainSlider").value = 2;
+    $("tauSlider").value = 2;
+
+    updateSimulation();
+  }
+);
+
+// --------------------------------------
+// Initialize
+// --------------------------------------
+
+window.addEventListener("load",() => {
+
+  updateSimulation();
+  loadQuestion();
+
+});
+
+</script>
+
+</body>
+</html>

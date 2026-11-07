@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   Module 2 | First-Order Frequency Response
+  </title>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js">
+  </script>
+  <style>
+   :root {
+    --dark:#064e3b;
+    --primary:#047857;
+    --green:#059669;
+    --light:#ecfdf5;
+    --background:#f3faf6;
+    --border:#d1e7db;
+    --text:#173d30;
+    --muted:#647d70;
+    --red:#b91c1c;
+}
+
+* {
+    box-sizing:border-box;
+}
+
+body {
+    margin:0;
+    font-family:"Segoe UI",Arial,sans-serif;
+    background:var(--background);
+    color:var(--text);
+    line-height:1.6;
+}
+
+.container {
+    max-width:1250px;
+    margin:auto;
+}
+
+header {
+    background:linear-gradient(120deg,#064e3b,#047857,#059669);
+    color:white;
+    padding:38px 24px;
+}
+
+header h1 {
+    margin:0 0 8px;
+    font-size:clamp(25px,3vw,37px);
+    color:white;
+}
+
+header p {
+    color:#d1fae5;
+    margin:4px 0;
+}
+
+.module-nav {
+    background:var(--dark);
+    padding:14px 20px;
+    text-align:center;
+    display:flex;
+    justify-content:center;
+    gap:30px;
+    flex-wrap:wrap;
+}
+
+.module-nav a {
+    color:white;
+    font-weight:700;
+    text-decoration:none;
+}
+
+.module-nav a:hover,.module-nav a:focus {
+    text-decoration:underline;
+}
+
+main {
+    padding:25px 20px 50px;
+}
+
+.layout {
+    display:grid;
+    grid-template-columns:300px minmax(0,1fr);
+    gap:22px;
+    align-items:start;
+}
+
+.sidebar {
+    position:sticky;
+    top:15px;
+}
+
+.content {
+    display:grid;
+    gap:20px;
+    min-width:0;
+}
+
+.card {
+    background:white;
+    border:1px solid var(--border);
+    border-radius:15px;
+    padding:23px;
+    margin-bottom:18px;
+    box-shadow:0 5px 18px rgba(6,78,59,.05);
+    min-width:0;
+}
+
+.content .card {
+    margin-bottom:0;
+}
+
+h2,h3 {
+    color:var(--dark);
+    margin-top:0;
+}
+
+h2 {
+    font-size:21px;
+    margin-bottom:8px;
+}
+
+h3 {
+    font-size:16px;
+}
+
+.subtitle {
+    color:var(--muted);
+    font-size:14px;
+    margin-top:0;
+    margin-bottom:20px;
+}
+
+.control {
+    margin-bottom:25px;
+}
+
+.control-top {
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    align-items:center;
+    margin-bottom:12px;
+    font-weight:600;
+    font-size:14px;
+}
+
+.value {
+    background:var(--light);
+    color:var(--primary);
+    padding:4px 11px;
+    border-radius:7px;
+    white-space:nowrap;
+}
+
+input[type=range] {
+    width:100%;
+    accent-color:var(--green);
+    cursor:pointer;
+}
+
+input[type=number],select {
+    padding:10px;
+    border:1px solid #a7cdbb;
+    border-radius:8px;
+    width:100%;
+    font:inherit;
+    max-width:100%;
+}
+
+label {
+    display:block;
+    font-weight:600;
+    font-size:14px;
+    margin:12px 0 7px;
+}
+
+.stats {
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:12px;
+    margin:16px 0;
+}
+
+.stat {
+    background:var(--light);
+    border:1px solid var(--border);
+    border-left:4px solid var(--green);
+    padding:15px;
+    border-radius:10px;
+    min-width:0;
+}
+
+.stat-label {
+    color:var(--muted);
+    font-size:12px;
+}
+
+.stat-value {
+    font-size:21px;
+    font-weight:800;
+    color:var(--dark);
+    margin:5px 0;
+    overflow-wrap:anywhere;
+}
+
+.plot {
+    width:100%;
+    height:400px;
+}
+
+.caption {
+    color:var(--muted);
+    font-size:14px;
+    margin-top:12px;
+}
+
+.info {
+    background:var(--light);
+    border-left:4px solid var(--green);
+    border-radius:8px;
+    padding:13px 15px;
+    font-size:14px;
+}
+
+.calculator-inputs {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:16px;
+}
+
+.calculator-results {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+    margin:18px 0;
+}
+
+.btn {
+    border:1px solid var(--primary);
+    color:var(--primary);
+    background:white;
+    border-radius:9px;
+    padding:11px 16px;
+    font-weight:700;
+    font:inherit;
+    cursor:pointer;
+    margin:10px 8px 0 0;
+}
+
+.btn:hover {
+    background:var(--light);
+}
+
+.btn.primary {
+    background:var(--dark);
+    color:white;
+}
+
+.btn.primary:hover {
+    background:var(--primary);
+}
+
+.actions {
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.actions .btn {
+    margin-right:0;
+}
+
+.feedback {
+    font-weight:600;
+    margin-top:15px;
+}
+
+.table-scroll {
+    overflow-x:auto;
+}
+
+table {
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+}
+
+th {
+    background:var(--dark);
+    color:white;
+    text-align:left;
+    padding:13px;
+}
+
+td {
+    padding:13px;
+    border-bottom:1px solid var(--border);
+}
+
+.pass,.fail {
+    display:inline-block;
+    padding:4px 12px;
+    border-radius:20px;
+    font-weight:700;
+}
+
+.pass {
+    background:#d1fae5;
+    color:#047857;
+}
+
+.fail {
+    background:#fee2e2;
+    color:#b91c1c;
+}
+
+footer {
+    text-align:center;
+    color:var(--muted);
+    padding:25px;
+    font-size:13px;
+}
+
+@media(max-width:1000px) {
+    .layout {
+        grid-template-columns:1fr;
+    }
+    .sidebar {
+        position:static;
+    }
+    .stats {
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+}
+
+@media(max-width:650px) {
+    .card {
+        padding:16px;
+    }
+    .plot {
+        height:350px;
+    }
+    .stats,.calculator-inputs,.calculator-results {
+        grid-template-columns:1fr;
+    }
+    th,td {
+        padding:8px;
+        font-size:13px;
+    }
+    .module-nav {
+        gap:14px;
+    }
+}
+  </style>
+ </head>
+ <body>
+  <header>
+   <div class="container">
+    <h1>First-Order Sensor Response Simulator</h1>
+    <p>Dynamic Characteristics Interactive Toolkit</p>
+    <p>Module 2 — ENCS4380 Interfacing Techniques</p>
+    <p>Birzeit University</p>
+   </div>
+  </header>
+  <nav aria-label="Module navigation" class="module-nav">
+   <a href="index.html">Module 1: Time Response</a>
+   <a aria-current="page" href="module2.html">Module 2: Frequency Response</a>
+  </nav>
+  <main class="container">
+   <div class="layout">
+    <aside class="sidebar">
+     <section class="card">
+      <h2>Simulation Controls</h2>
+      <p class="subtitle">Move the sliders to see the frequency response update instantly.</p>
+      <div class="control">
+       <div class="control-top">
+        <label for="tau">Time Constant (τ)</label>
+        <span class="value">
+         <span id="tauValue">0.20</span>
+         s
+        </span>
+       </div>
+       <input id="tau" max="2" min="0.01" step="0.01" type="range" value="0.20"/>
+      </div>
+      <div class="control">
+       <div class="control-top">
+        <label for="omega">Angular Frequency (ω)</label>
+        <span class="value">
+         <span id="omegaValue">2.00</span>
+         rad/s
+        </span>
+       </div>
+       <input id="omega" max="50" min="0.1" step="0.1" type="range" value="2"/>
+      </div>
+     </section>
+     <section class="card">
+      <h3>Understanding Frequency Response</h3>
+      <p class="caption">A first-order sensor reduces the amplitude of higher-frequency signals and introduces phase lag.</p>
+      <div class="info">
+       At the cutoff frequency ωc = 1/τ, the amplitude ratio is approximately 0.707 (−3.01 dB), and the phase shift is −45°.
+      </div>
+     </section>
+    </aside>
+    <div class="content">
+     <section class="card">
+      <h2>1. Frequency Response Overview</h2>
+      <p class="subtitle">Steady-state response of a first-order sensor to sinusoidal input.</p>
+      <div class="stats">
+       <div class="stat">
+        <div class="stat-label">
+         Amplitude Ratio (M)
+        </div>
+        <div class="stat-value" id="amplitudeValue">
+        </div>
+       </div>
+       <div class="stat">
+        <div class="stat-label">
+         Phase Lag (φ)
+        </div>
+        <div class="stat-value" id="phaseValue">
+        </div>
+       </div>
+       <div class="stat">
+        <div class="stat-label">
+         Cutoff Frequency (ωc)
+        </div>
+        <div class="stat-value" id="cutoffValue">
+        </div>
+       </div>
+       <div class="stat">
+        <div class="stat-label">
+         Dynamic Error (δ)
+        </div>
+        <div class="stat-value" id="errorValue">
+        </div>
+       </div>
+      </div>
+      <div class="info">
+       M = 1 / √(1 + (ωτ)²)   |   φ = −arctan(ωτ)   |   δ = (M − 1) × 100%
+      </div>
+     </section>
+     <section class="card">
+      <h2>2. Input and Output Sine Waves</h2>
+      <p class="subtitle">Steady-state sinusoidal response for a unit-amplitude input.</p>
+      <div class="plot" id="sinePlot">
+      </div>
+     </section>
+     <section class="card">
+      <h2>3. Bode Plots</h2>
+      <p class="subtitle">Magnitude and phase across angular frequency, with the cutoff frequency marked on both graphs.</p>
+      <div class="plot" id="magnitudePlot">
+      </div>
+      <div class="plot" id="phasePlot">
+      </div>
+     </section>
+     <section class="card">
+      <h2>4. Dynamic Error Calculator</h2>
+      <p class="subtitle">Find the maximum allowable time constant for an input frequency and amplitude-error limit.</p>
+      <div class="calculator-inputs">
+       <div>
+        <label for="frequency">Maximum Input Frequency (Hz)</label>
+        <input id="frequency" min="0.001" step="any" type="number" value="100"/>
+       </div>
+       <div>
+        <label for="allowedError">Maximum Allowed Dynamic Error (%)</label>
+        <input id="allowedError" max="99.999" min="0.001" step="any" type="number" value="5"/>
+       </div>
+      </div>
+      <div class="calculator-results">
+       <div class="stat">
+        <div class="stat-label">
+         Maximum Time Constant
+        </div>
+        <div class="stat-value" id="maxTauValue">
+        </div>
+       </div>
+       <div class="stat">
+        <div class="stat-label">
+         Amplitude Ratio at Limit
+        </div>
+        <div class="stat-value" id="limitAmplitude">
+        </div>
+       </div>
+      </div>
+      <div class="info">
+       <strong>
+        Example:
+       </strong>
+       At 100 Hz and a 5% error limit, τmax ≈ 0.52 ms. The phase lag at 50 Hz using that τ is approximately 9.3°.
+       <p id="validationPhase">
+       </p>
+      </div>
+     </section>
+     <section class="card">
+      <h2>5. Predict, Then Check</h2>
+      <p class="subtitle">Predict what happens when angular frequency increases while τ stays fixed. Then check your prediction using the simulation.</p>
+      <label for="amplitudePrediction">What happens to the amplitude ratio?</label>
+      <select id="amplitudePrediction">
+       <option value="">Choose your prediction</option>
+       <option value="increase">Increases</option>
+       <option value="decrease">Decreases</option>
+       <option value="same">Stays the same</option>
+      </select>
+      <label for="phasePrediction">What happens to the magnitude of the phase lag?</label>
+      <select id="phasePrediction">
+       <option value="">Choose your prediction</option>
+       <option value="increase">Increases</option>
+       <option value="decrease">Decreases</option>
+       <option value="same">Stays the same</option>
+      </select>
+      <div class="actions">
+       <button class="btn primary" id="checkPrediction" type="button">Check Prediction</button>
+       <button class="btn" id="resetPrediction" type="button">Try Again</button>
+      </div>
+      <p aria-live="polite" class="feedback" id="predictionFeedback">
+      </p>
+     </section>
+     <section class="card">
+      <h2>6. Validation Checks</h2>
+      <p class="subtitle">Required homework reference checks. These use fixed values and do not depend on the sliders.</p>
+      <div class="table-scroll">
+       <table>
+        <thead>
+         <tr>
+          <th>Test</th>
+          <th>Expected</th>
+          <th>Calculated</th>
+          <th>Status</th>
+         </tr>
+        </thead>
+        <tbody id="validationRows">
+        </tbody>
+       </table>
+      </div>
+      <p class="caption">Rounded expected values are compared using tolerances appropriate to their stated precision.</p>
+     </section>
+    </div>
+   </div>
+  </main>
+  <footer>
+   ENCS4380 — Dynamic Characteristics Toolkit | Module 2
+  </footer>
+  <script>
+   const tauSlider=document.getElementById('tau');
+const omegaSlider=document.getElementById('omega');
+const $=id=>document.getElementById(id);
+const amplitude=(tau,omega)=>1/Math.sqrt(1+(omega*tau)**2);
+const phaseDeg=(tau,omega)=>-Math.atan(omega*tau)*180/Math.PI;
+const maxAllowedTau=(f,errorPercent)=>Math.sqrt(1/(1-errorPercent/100)**2-1)/(2*Math.PI*f);
+function updateSimulation() {
+  const tau=Number(tauSlider.value),omega=Number(omegaSlider.value);
+  const M=amplitude(tau,omega),phase=phaseDeg(tau,omega),cutoff=1/tau;
+  $('tauValue').textContent=tau.toFixed(2);
+  $('omegaValue').textContent=omega.toFixed(2);
+  $('amplitudeValue').textContent=M.toFixed(4);
+  $('phaseValue').textContent=phase.toFixed(2)+'°';
+  $('cutoffValue').textContent=cutoff.toFixed(2)+' rad/s';
+  $('errorValue').textContent=((M-1)*100).toFixed(2)+'%';
+  const time=[],input=[],output=[];
+  const period=2*Math.PI/omega;
+  for(let i=0;i<=600;i++) {
+    const t=i/600*3*period;
+    time.push(t);
+    input.push(Math.sin(omega*t));
+    output.push(M*Math.sin(omega*t+phase*Math.PI/180));
+  }  const config= {
+    responsive:true,displaylogo:false
+  };
+  Plotly.react('sinePlot',[ {
+    x:time,y:input,type:'scatter',mode:'lines',name:'Input Signal',line: {
+      color:'#2563eb',width:3
+    }
+  }, {
+    x:time,y:output,type:'scatter',mode:'lines',name:'Output Signal',line: {
+      color:'#059669',width:3
+    }
+  }  ], {
+    title:'Sinusoidal Frequency Response',xaxis: {
+      title:'Time (s)'
+    },yaxis: {
+      title:'Amplitude',range:[-1.2,1.2]
+    },margin: {
+      t:60,r:20,b:60,l:60
+    },legend: {
+      orientation:'h',y:-0.3
+    }
+  },config);
+  const frequencies=[],magnitudes=[],phases=[];
+  for(let i=0;i<=400;i++) {
+    const f=cutoff/100*Math.pow(10000,i/400);
+    frequencies.push(f);
+    magnitudes.push(20*Math.log10(amplitude(tau,f)));
+    phases.push(phaseDeg(tau,f));
+  }  const cutoffLine= {
+    type:'line',x0:cutoff,x1:cutoff,y0:0,y1:1,yref:'paper',line: {
+      color:'#dc2626',dash:'dash',width:2
+    }
+  };
+  Plotly.react('magnitudePlot',[ {
+    x:frequencies,y:magnitudes,type:'scatter',mode:'lines',name:'Magnitude',line: {
+      color:'#2563eb',width:3
+    }
+  }, {
+    x:[omega],y:[20*Math.log10(M)],type:'scatter',mode:'markers',name:'Selected Frequency',marker: {
+      color:'#059669',size:11
+    }
+  }  ], {
+    title:'Bode Magnitude Plot',xaxis: {
+      title:'Angular Frequency (rad/s)',type:'log'
+    },yaxis: {
+      title:'Magnitude (dB)'
+    },shapes:[cutoffLine],annotations:[ {
+      x:cutoff,y:-3.0103,text:'Cutoff (−3 dB)',showarrow:true,arrowhead:2,ax:65,ay:-40
+    }],margin: {
+      t:60,r:30,b:65,l:65
+    }
+  },config);
+  Plotly.react('phasePlot',[ {
+    x:frequencies,y:phases,type:'scatter',mode:'lines',name:'Phase',line: {
+      color:'#7c3aed',width:3
+    }
+  }, {
+    x:[omega],y:[phase],type:'scatter',mode:'markers',name:'Selected Frequency',marker: {
+      color:'#059669',size:11
+    }
+  }  ], {
+    title:'Bode Phase Plot',xaxis: {
+      title:'Angular Frequency (rad/s)',type:'log'
+    },yaxis: {
+      title:'Phase (degrees)',range:[-95,5]
+    },shapes:[cutoffLine],annotations:[ {
+      x:cutoff,y:-45,text:'Cutoff (−45°)',showarrow:true,arrowhead:2,ax:65,ay:-40
+    }],margin: {
+      t:60,r:30,b:65,l:65
+    }
+  },config);
+} function updateErrorCalculator() {
+  const f=Number($('frequency').value),e=Number($('allowedError').value);
+  if(!Number.isFinite(f)||f<=0||!Number.isFinite(e)||e<=0||e>=100) {
+    $('maxTauValue').textContent='Invalid input';
+    $('limitAmplitude').textContent='—';
+    $('validationPhase').textContent='Enter a positive frequency and an error between 0% and 100%.';
+    return;
+  }  const tau=maxAllowedTau(f,e);
+  $('maxTauValue').textContent=(tau*1000).toFixed(3)+' ms';
+  $('limitAmplitude').textContent=(1-e/100).toFixed(4);
+  $('validationPhase').textContent='Phase lag at 50 Hz using calculated τ: '+Math.abs(phaseDeg(tau,2*Math.PI*50)).toFixed(2)+'°';
+} function checkPrediction() {
+  const a=$('amplitudePrediction').value,p=$('phasePrediction').value;
+  const feedback=$('predictionFeedback');
+  if(!a||!p) {
+    feedback.textContent='Please select both predictions first.';
+    return;
+  }  const tau=Number(tauSlider.value),oldOmega=Number(omegaSlider.value);
+  const maxOmega=Number(omegaSlider.max);
+  if(oldOmega>=maxOmega) {
+    feedback.textContent='The frequency is already at its maximum (50 rad/s). Lower the frequency slider and try again.';
+    return;
+  }  const oldM=amplitude(tau,oldOmega);
+  const oldLag=Math.abs(phaseDeg(tau,oldOmega));
+  // Use a frequency the slider can actually reach, respecting its 0.1 step.
+  const targetOmega=Math.min(maxOmega,Math.max(oldOmega+0.1,oldOmega*1.5));
+  omegaSlider.value=targetOmega.toFixed(1);
+  const newOmega=Number(omegaSlider.value);
+  updateSimulation();
+  const newM=amplitude(tau,newOmega);
+  const newLag=Math.abs(phaseDeg(tau,newOmega));
+  const correct=a==='decrease'&&p==='increase';
+  feedback.textContent=(correct?'Correct! ':'Not quite. ')+   'Frequency increased from '+oldOmega.toFixed(1)+' to '+newOmega.toFixed(1)+
+  ' rad/s. M decreased ('+oldM.toFixed(3)+' → '+newM.toFixed(3)+   ') and the phase-lag magnitude increased ('+oldLag.toFixed(2)+'° → '+newLag.toFixed(2)+'°).';
+} function resetPrediction() {
+  $('amplitudePrediction').value='';
+  $('phasePrediction').value='';
+  $('predictionFeedback').textContent='';
+} function validationChecks() {
+  const t1M=amplitude(.2,2),t1Phase=Math.abs(phaseDeg(.2,2));
+  const tau=maxAllowedTau(100,5),phase50=Math.abs(phaseDeg(tau,2*Math.PI*50));
+  const tests=[   ['τ = 0.2 s, sin(2t): amplitude ratio','0.93',t1M.toFixed(4),Math.abs(t1M-.93)<.005],
+  ['τ = 0.2 s, sin(2t): phase lag','21.8°',t1Phase.toFixed(2)+'°',Math.abs(t1Phase-21.8)<.1],   ['100 Hz, 5% error: maximum τ',
+  '0.52 ms',(tau*1000).toFixed(3)+' ms',Math.abs(tau*1000-.52)<.01],   ['50 Hz phase lag using maximum τ',
+  '9.3°',phase50.toFixed(2)+'°',Math.abs(phase50-9.3)<.15]  ];
+  const tbody=$('validationRows');
+  tbody.replaceChildren();
+  for(const [name,expected,calculated,passed] of tests) {
+    const tr=document.createElement('tr');
+    for(const value of [name,expected,calculated,passed?'PASS':'FAIL']) {
+      const td=document.createElement('td');
+      td.textContent=value;
+      if(value==='PASS'||value==='FAIL')td.className=passed?'pass':'fail';
+      tr.appendChild(td);
+    }tbody.appendChild(tr);
+  }
+} tauSlider.addEventListener('input',updateSimulation);
+omegaSlider.addEventListener('input',updateSimulation);
+$('frequency').addEventListener('input',updateErrorCalculator);
+$('allowedError').addEventListener('input',updateErrorCalculator);
+$('checkPrediction').addEventListener('click',checkPrediction);
+$('resetPrediction').addEventListener('click',resetPrediction);
+updateSimulation();
+updateErrorCalculator();
+validationChecks();
+  </script>
+ </body>
+</html>

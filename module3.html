@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 3 - Second Order Response</title>
+
+    <style>
+        :root {
+            --dark: #064e3b;
+            --primary: #047857;
+            --green: #059669;
+            --light: #ecfdf5;
+            --background: #f3faf6;
+            --border: #d1e7db;
+            --text: #173d30;
+            --muted: #647d70;
+            --red: #b91c1c;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1250px;
+            margin: auto;
+        }
+
+        header {
+            background: linear-gradient(120deg, #064e3b, #047857, #059669);
+            color: white;
+            padding: 38px 24px;
+        }
+
+        header h1 {
+            margin: 0 0 8px;
+            font-size: 32px;
+        }
+
+        header p {
+            color: #d1fae5;
+            margin: 4px 0;
+        }
+
+        nav {
+            background: var(--dark);
+            padding: 14px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        main {
+            padding: 25px 20px 50px;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 300px minmax(0, 1fr);
+            gap: 22px;
+            align-items: start;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 15px;
+        }
+
+        .content {
+            display: grid;
+            gap: 20px;
+            min-width: 0;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 23px;
+            box-shadow: 0 5px 18px rgba(6, 78, 59, 0.05);
+            min-width: 0;
+        }
+
+        h2,
+        h3 {
+            color: var(--dark);
+        }
+
+        h2 {
+            font-size: 21px;
+            margin-top: 0;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .control {
+            margin-bottom: 22px;
+        }
+
+        .control-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 9px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .value {
+            background: var(--light);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 7px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--green);
+        }
+
+        .info {
+            background: var(--light);
+            border-left: 4px solid var(--green);
+            border-radius: 8px;
+            padding: 13px;
+            font-size: 14px;
+        }
+
+        .btn {
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            background: white;
+            border-radius: 9px;
+            padding: 10px 15px;
+            font: inherit;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn.primary {
+            background: var(--dark);
+            color: white;
+        }
+
+        .btn.full {
+            width: 100%;
+        }
+
+        .equations {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .equation-box {
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px 10px;
+            text-align: center;
+            overflow-x: auto;
+        }
+
+        .equation-box small {
+            display: block;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        .formula {
+            font-family: "Cambria Math", serif;
+            font-size: 17px;
+            overflow-wrap: anywhere;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .stat {
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--green);
+            padding: 14px;
+            border-radius: 10px;
+            min-width: 0;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .stat-value {
+            font-size: 19px;
+            font-weight: 800;
+            color: var(--dark);
+            overflow-wrap: anywhere;
+        }
+
+        .stat-note {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .plot {
+            width: 100%;
+            height: 390px;
+            display: block;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .matrix {
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 15px;
+            overflow-x: auto;
+        }
+
+        .matrix pre {
+            font: 15px/1.8 Consolas, monospace;
+            margin: 0;
+            color: var(--dark);
+        }
+
+        .caption {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .prediction {
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 17px;
+        }
+
+        .answers {
+            display: grid;
+            gap: 9px;
+            margin: 14px 0;
+        }
+
+        .answer {
+            text-align: left;
+            border: 2px solid var(--border);
+            border-radius: 9px;
+            padding: 11px 14px;
+            background: white;
+            color: var(--text);
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .answer.selected {
+            border-color: var(--primary);
+            background: #d1fae5;
+        }
+
+        .answer.correct {
+            border-color: var(--primary);
+            background: #d1fae5;
+        }
+
+        .answer.wrong {
+            border-color: var(--red);
+            background: #fff1f2;
+        }
+
+        .feedback {
+            display: none;
+            margin-top: 13px;
+            padding: 12px;
+            border-radius: 8px;
+            background: white;
+            border-left: 4px solid var(--green);
+        }
+
+        .feedback.visible {
+            display: block;
+        }
+
+        .feedback.error {
+            border-color: var(--red);
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            background: var(--dark);
+            color: white;
+            text-align: left;
+            padding: 12px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 11px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .pass {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--muted);
+            padding: 25px;
+        }
+
+        @media (max-width: 1000px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 650px) {
+            .equations,
+            .matrix-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .plot {
+                height: 340px;
+            }
+
+            .card {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="container">
+            <h1>Second-Order System Response Simulator</h1>
+            <p>Dynamic Characteristics Interactive Toolkit</p>
+            <p>Module 3 — ENCS4380 Interfacing Techniques</p>
+            <p>Birzeit University</p>
+        </div>
+    </header>
+
+    <nav>
+        <a href="index.html">Module 1: Time Response</a>
+        <a href="module2.html">Module 2: Frequency Response</a>
+        <a href="module3.html">Module 3: Second-Order Response</a>
+    
+    <a href="module4.html">Module 4: Guess the Sensor</a>
+</nav>
+
+    <main class="container">
+        <div class="layout">
+
+            <aside class="sidebar">
+
+                <section class="card">
+                    <h2>Simulation Controls</h2>
+                    <p class="subtitle">
+                        Change mass, damping and stiffness.
+                        All plots and values update instantly.
+                    </p>
+
+                    <div class="control">
+                        <div class="control-top">
+                            <label for="mSlider">Mass (m)</label>
+                            <span class="value" id="mValue">1.00 kg</span>
+                        </div>
+                        <input id="mSlider" type="range"
+                            min="0.2" max="5" step="0.05" value="1">
+                    </div>
+
+                    <div class="control">
+                        <div class="control-top">
+                            <label for="bSlider">Damping coefficient (b)</label>
+                            <span class="value" id="bValue">2.00 N·s/m</span>
+                        </div>
+                        <input id="bSlider" type="range"
+                            min="0" max="20" step="0.05" value="2">
+                    </div>
+
+                    <div class="control">
+                        <div class="control-top">
+                            <label for="kSlider">Spring stiffness (k)</label>
+                            <span class="value" id="kValue">4.00 N/m</span>
+                        </div>
+                        <input id="kSlider" type="range"
+                            min="0.2" max="30" step="0.1" value="4">
+                    </div>
+
+                    <div class="info">
+                        <strong>Damping case:</strong>
+                        <span id="dampingCase">Underdamped</span>
+                        <br>
+                        <strong>ζ:</strong>
+                        <span id="zetaValue">0.500</span>
+                        &nbsp;
+                        <strong>ωn:</strong>
+                        <span id="wnValue">2.000 rad/s</span>
+                    </div>
+
+                    <div class="actions">
+                        <button class="btn" id="underPreset">Underdamped</button>
+                        <button class="btn" id="criticalPreset">Critical</button>
+                        <button class="btn" id="overPreset">Overdamped</button>
+                        <button class="btn full" id="resetButton">
+                            Reset to validation example
+                        </button>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h3>Parameter Guide</h3>
+                    <p class="caption">
+                        Increasing m lowers natural frequency.
+                        Increasing b increases damping.
+                        Increasing k raises natural frequency.
+                    </p>
+                    <div class="info">
+                        ζ = b/(2√mk)
+                        <br>
+                        ωn = √(k/m)
+                    </div>
+                </section>
+
+            </aside>
+
+            <div class="content">
+
+                <section class="card">
+                    <h2>1. Mathematical Model</h2>
+                    <p class="subtitle">
+                        Mass–spring–damper system with a unit-step force.
+                        The plotted output is displacement x(t),
+                        with final value x(∞) = 1/k.
+                    </p>
+
+                    <div class="equations">
+
+                        <div class="equation-box">
+                            <small>Differential Equation</small>
+                            <div class="formula">
+                                mẍ + bẋ + kx = F(t)
+                            </div>
+                        </div>
+
+                        <div class="equation-box">
+                            <small>Transfer Function</small>
+                            <div class="formula">
+                                G(s) = 1 / (ms² + bs + k)
+                            </div>
+                        </div>
+
+                        <div class="equation-box">
+                            <small>Standard Parameters</small>
+                            <div class="formula">
+                                ωn = √(k/m)
+                                <br>
+                                ζ = b/(2√mk)
+                            </div>
+                        </div>
+
+                        <div class="equation-box">
+                            <small>Step Response</small>
+                            <div class="formula">
+                                <span id="stepEquation">x(t) = (1/k) × unit-step shape</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>2. Step Response</h2>
+                    <p class="subtitle">
+                        The curve and performance measures update with the selected parameters.
+                    </p>
+                    <div class="stats" id="metricCards"></div>
+                    <svg id="responsePlot" class="plot"></svg>
+                    <p class="caption" id="metricNote"></p>
+                </section>
+
+                <section class="card">
+                    <h2>3. Poles in the s-Plane</h2>
+                    <p class="subtitle">
+                        Roots of s² + (b/m)s + k/m = 0.
+                        The poles determine the damping case and response shape.
+                    </p>
+                    <div class="stats" id="poleCards"></div>
+                    <svg id="polePlot" class="plot"></svg>
+                </section>
+
+                <section class="card">
+                    <h2>4. State-Space Representation</h2>
+                    <p class="subtitle">
+                        With x₁ = x (displacement), x₂ = ẋ (velocity), input F(t):
+                        ẋ = Ax + Bu and y = x₁ = Cx, where C = [1  0].
+                    </p>
+
+                    <div class="matrix-grid">
+                        <div class="matrix">
+                            <h3>State Matrix A</h3>
+                            <pre id="matrixA"></pre>
+                        </div>
+
+                        <div class="matrix">
+                            <h3>Input Matrix B</h3>
+                            <pre id="matrixB"></pre>
+                        </div>
+
+                        <div class="matrix">
+                            <h3>Output Matrix C</h3>
+                            <pre id="matrixC"></pre>
+                        </div>
+
+                        <div class="matrix">
+                            <h3>Eigenvalues of A</h3>
+                            <pre id="eigenValues"></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>5. Phase Plane</h2>
+                    <p class="subtitle">
+                        State trajectory (x₁, x₂) = (displacement, velocity)
+                        during the unit-step force response.
+                    </p>
+                    <svg id="phasePlot" class="plot"></svg>
+                    <p class="caption">
+                        Underdamped systems produce a decaying spiral.
+                        Critical and overdamped systems approach equilibrium
+                        without oscillatory spiraling.
+                    </p>
+                </section>
+
+                <section class="card">
+                    <h2>6. Predict, Then Check</h2>
+                    <p class="subtitle">
+                        Predict the effect before changing a parameter.
+                        Select an answer, then check it.
+                    </p>
+
+                    <div class="prediction">
+                        <p><strong>Try this prediction experiment:</strong> With m = 1 kg and k = 4 N/m, predict what happens to overshoot when b changes from 2 to 4 N·s/m. Choose your answer below, check it, then press <em>Apply experiment</em> to verify on the live curve.</p>
+                        <button class="btn" id="applyExperiment">Apply experiment (b = 4)</button>
+                        <div class="info" id="predictionPrompt"></div>
+                        <div class="answers" id="predictionAnswers"></div>
+
+                        <div class="actions">
+                            <button class="btn primary" id="checkPrediction">
+                                Check Prediction
+                            </button>
+                            <button class="btn" id="nextQuestion">
+                                Next Question
+                            </button>
+                        </div>
+
+                        <div class="feedback" id="predictionFeedback"></div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>7. Validation Checks</h2>
+                    <p class="subtitle">
+                        Module 3 validation checks 4–6 from the homework specification.
+                    </p>
+
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Validation Test</th>
+                                    <th>Expected</th>
+                                    <th>Calculated</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="validationRows"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        ENCS4380 — Dynamic Characteristics Toolkit | Module 3
+    </footer>
+
+    <script>
+        "use strict";
+
+        const $ = id => document.getElementById(id);
+
+        const state = {
+            m: 1,
+            b: 2,
+            k: 4
+        };
+
+        const COLORS = {
+            green: "#059669",
+            purple: "#7c3aed",
+            dark: "#064e3b",
+            grid: "#d1e7db"
+        };
+
+        const fmt = (v, d = 3) =>
+            Number.isFinite(v) ? Number(v).toFixed(d) : "—";
+
+        function params() {
+            return {
+                ...state,
+                wn: Math.sqrt(state.k / state.m),
+                zeta: state.b / (2 * Math.sqrt(state.m * state.k))
+            };
+        }
+
+        function roots(p) {
+            const D = p.zeta * p.zeta - 1;
+
+            if (D < -1e-10) {
+                const re = -p.zeta * p.wn;
+                const im = p.wn * Math.sqrt(1 - p.zeta * p.zeta);
+
+                return [
+                    { re, im },
+                    { re, im: -im }
+                ];
+            }
+
+            if (Math.abs(D) <= 1e-10) {
+                return [
+                    { re: -p.wn, im: 0 },
+                    { re: -p.wn, im: 0 }
+                ];
+            }
+
+            const q = Math.sqrt(D);
+
+            return [
+                { re: -p.wn * (p.zeta - q), im: 0 },
+                { re: -p.wn * (p.zeta + q), im: 0 }
+            ];
+        }
+
+        function response(t, p) {
+            if (t <= 0) return 0;
+
+            const z = p.zeta;
+            const w = p.wn;
+
+            if (z < 1 - 1e-9) {
+                const wd = w * Math.sqrt(1 - z * z);
+
+                return 1 - Math.exp(-z * w * t) *
+                    (
+                        Math.cos(wd * t) +
+                        (z / Math.sqrt(1 - z * z)) * Math.sin(wd * t)
+                    );
+            }
+
+            if (Math.abs(z - 1) <= 1e-9) {
+                return 1 - (1 + w * t) * Math.exp(-w * t);
+            }
+
+            const q = Math.sqrt(z * z - 1);
+            const r1 = -w * (z - q);
+            const r2 = -w * (z + q);
+
+            return 1 +
+                (r2 * Math.exp(r1 * t) - r1 * Math.exp(r2 * t)) / (r1 - r2);
+        }
+
+        function decayRates(p) {
+            const poleRoots = roots(p);
+
+            const rates = poleRoots
+                .map(root => Math.abs(root.re))
+                .filter(rate => rate > 1e-12);
+
+            if (rates.length === 0) {
+                return {
+                    fast: p.wn,
+                    slow: p.wn
+                };
+            }
+
+            return {
+                fast: Math.max(...rates),
+                slow: Math.min(...rates)
+            };
+        }
+
+        function responseDerivative(t, p) {
+            if (t <= 0) return 0;
+
+            const z = p.zeta;
+            const w = p.wn;
+
+            if (z < 1 - 1e-9) {
+                const wd = w * Math.sqrt(1 - z * z);
+
+                return (w * w / wd) *
+                    Math.exp(-z * w * t) *
+                    Math.sin(wd * t);
+            }
+
+            if (Math.abs(z - 1) <= 1e-9) {
+                return w * w * t * Math.exp(-w * t);
+            }
+
+            const q = Math.sqrt(z * z - 1);
+            const r1 = -w * (z - q);
+            const r2 = -w * (z + q);
+
+            return (w * w) *
+                (Math.exp(r1 * t) - Math.exp(r2 * t)) / (r1 - r2);
+        }
+
+        function endTime(p) {
+            if (p.zeta < 1e-10) return 6 * Math.PI / p.wn;
+            const rates = decayRates(p);
+
+            return Math.min(
+                10000,
+                Math.max(12 / rates.slow, 1 / p.wn)
+            );
+        }
+
+        function sampleTimes(p, n = 1600) {
+            const end = endTime(p);
+            const rates = decayRates(p);
+            const fastWindow = Math.min(end, 8 / rates.fast);
+
+            if (end <= fastWindow * 1.001) {
+                return Array.from(
+                    { length: n },
+                    (_, i) => end * i / (n - 1)
+                );
+            }
+
+            const firstCount = Math.floor(n * 0.55);
+            const secondCount = n - firstCount;
+            const times = [];
+
+            for (let i = 0; i < firstCount; i++) {
+                times.push(fastWindow * i / (firstCount - 1));
+            }
+
+            for (let i = 1; i < secondCount; i++) {
+                const fraction = i / (secondCount - 1);
+
+                times.push(
+                    fastWindow * Math.pow(end / fastWindow, fraction)
+                );
+            }
+
+            return times;
+        }
+
+        function samples(p) {
+            const t = sampleTimes(p);
+            const y = t.map(ti => response(ti, p));
+
+            return {
+                t,
+                y,
+                end: t[t.length - 1]
+            };
+        }
+
+        function crossing(t, y, target) {
+            for (let i = 1; i < y.length; i++) {
+                if (y[i] >= target && y[i - 1] < target) {
+                    const f = (target - y[i - 1]) / (y[i] - y[i - 1]);
+
+                    return t[i - 1] + f * (t[i] - t[i - 1]);
+                }
+            }
+
+            return null;
+        }
+
+        function metrics(p, d) {
+            const t10 = crossing(d.t, d.y, 0.1);
+            const t90 = crossing(d.t, d.y, 0.9);
+
+            const peak = Math.max(...d.y);
+            const pi = d.y.indexOf(peak);
+
+            // Find the last sample outside the ±2% band, then interpolate
+            // the final boundary crossing. This is O(n), not O(n²).
+            let lastOutside = -1;
+            for (let i = 0; i < d.y.length; i++) {
+                if (Math.abs(d.y[i] - 1) > 0.02) lastOutside = i;
+            }
+            let settling = null;
+            if (p.zeta < 1e-10) settling = null; // undamped oscillation never settles
+            else if (lastOutside < 0) settling = 0;
+            else if (lastOutside < d.y.length - 1) {
+                const envelopeAtEnd = p.zeta < 1
+                    ? Math.exp(-p.zeta * p.wn * d.end) / Math.sqrt(1 - p.zeta * p.zeta)
+                    : 0;
+                if (envelopeAtEnd > 0.02) {
+                    settling = null;
+                } else {
+                const i = lastOutside;
+                const boundary = d.y[i] > 1 ? 1.02 : 0.98;
+                const dy = d.y[i + 1] - d.y[i];
+                const f = Math.abs(dy) < 1e-14 ? 1 : Math.max(0, Math.min(1, (boundary - d.y[i]) / dy));
+                settling = d.t[i] + f * (d.t[i + 1] - d.t[i]);
+                }
+            }
+
+            // For an underdamped system, the first peak is known exactly.
+            // Use that result instead of a potentially missed sampled maximum.
+            const z = p.zeta;
+            const exactPeakTime = z < 1 && z > 0
+                ? Math.PI / (p.wn * Math.sqrt(1 - z * z))
+                : z === 0 ? Math.PI / p.wn : null;
+            const exactPeak = exactPeakTime === null ? peak : response(exactPeakTime, p);
+            const overshoot = Math.max(0, (exactPeak - 1) * 100);
+            // Verify sampled-curve peak against the theoretical first peak.
+            // The exact value is displayed to avoid sampling-grid error.
+            const peakTime = overshoot > 0.01 ? exactPeakTime : null;
+
+            return {
+                rise: t10 !== null && t90 !== null ? t90 - t10 : null,
+                peakTime,
+                overshoot,
+                settling,
+                peak: Math.max(peak, exactPeak)
+            };
+        }
+
+        /* SVG GRAPH DRAWING */
+
+        function drawGraph(id, traces, xLabel, yLabel, options = {}) {
+            const svg = $(id);
+
+            const W = 850;
+            const H = 370;
+
+            const L = 75;
+            const R = 25;
+            const T = 25;
+            const B = 55;
+
+            const allX = traces.flatMap(t => t.x);
+            const allY = traces.flatMap(t => t.y);
+
+            let xmin = options.xmin ?? Math.min(...allX);
+            let xmax = options.xmax ?? Math.max(...allX);
+            let ymin = options.ymin ?? Math.min(...allY);
+            let ymax = options.ymax ?? Math.max(...allY);
+
+            if (xmax === xmin) {
+                xmin -= 1;
+                xmax += 1;
+            }
+
+            if (ymax === ymin) {
+                ymin -= 1;
+                ymax += 1;
+            }
+
+            const xp = x =>
+                L + (x - xmin) / (xmax - xmin) * (W - L - R);
+
+            const yp = y =>
+                H - B - (y - ymin) / (ymax - ymin) * (H - T - B);
+
+            svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+            svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+            let out = "";
+
+            for (let i = 0; i <= 5; i++) {
+                const x = L + i * (W - L - R) / 5;
+                const y = T + i * (H - T - B) / 5;
+
+                const xv = xmin + i * (xmax - xmin) / 5;
+                const yv = ymax - i * (ymax - ymin) / 5;
+
+                out += `
+                    <line x1="${x}" y1="${T}"
+                          x2="${x}" y2="${H - B}"
+                          stroke="${COLORS.grid}"/>
+
+                    <line x1="${L}" y1="${y}"
+                          x2="${W - R}" y2="${y}"
+                          stroke="${COLORS.grid}"/>
+
+                    <text x="${x}" y="${H - B + 22}"
+                          text-anchor="middle"
+                          font-size="12"
+                          fill="#647d70">${fmt(xv, 2)}</text>
+
+                    <text x="${L - 10}" y="${y + 4}"
+                          text-anchor="end"
+                          font-size="12"
+                          fill="#647d70">${fmt(yv, 2)}</text>
+                `;
+            }
+
+            out += `
+                <line x1="${L}" y1="${T}"
+                      x2="${L}" y2="${H - B}"
+                      stroke="#47685a"/>
+
+                <line x1="${L}" y1="${H - B}"
+                      x2="${W - R}" y2="${H - B}"
+                      stroke="#47685a"/>
+            `;
+
+            traces.forEach(tr => {
+                if (tr.type === "line") {
+                    let points = "";
+
+                    for (let i = 0; i < tr.x.length; i++) {
+                        points += `${xp(tr.x[i])},${yp(tr.y[i])} `;
+                    }
+
+                    out += `
+                        <polyline points="${points}"
+                                  fill="none"
+                                  stroke="${tr.color}"
+                                  stroke-width="3"
+                                  stroke-linejoin="round"/>
+                    `;
+                }
+
+                if (tr.type === "arrow") {
+                    const x1 = xp(tr.x[0]), y1 = yp(tr.y[0]);
+                    const x2 = xp(tr.x[1]), y2 = yp(tr.y[1]);
+                    const angle = Math.atan2(y2-y1, x2-x1);
+                    const size = 11;
+                    const a = angle + 2.5, b = angle - 2.5;
+                    out += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${tr.color}" stroke-width="3"/>`;
+                    out += `<polygon points="${x2},${y2} ${x2+size*Math.cos(a)},${y2+size*Math.sin(a)} ${x2+size*Math.cos(b)},${y2+size*Math.sin(b)}" fill="${tr.color}"/>`;
+                }
+                if (tr.type === "points") {
+                    tr.x.forEach((x, i) => {
+                        out += `
+                            <circle cx="${xp(x)}"
+                                    cy="${yp(tr.y[i])}"
+                                    r="7"
+                                    fill="${tr.color}"/>
+                        `;
+
+                        if (tr.labels && tr.labels[i]) {
+                            out += `
+                                <text x="${xp(x) + 11}"
+                                      y="${yp(tr.y[i]) - 10}"
+                                      font-size="12"
+                                      font-weight="bold"
+                                      fill="${COLORS.dark}">
+                                    ${tr.labels[i]}
+                                </text>
+                            `;
+                        }
+                    });
+                }
+            });
+
+            out += `
+                <text x="${(L + W - R) / 2}"
+                      y="${H - 10}"
+                      text-anchor="middle"
+                      font-size="14"
+                      fill="${COLORS.dark}">
+                    ${xLabel}
+                </text>
+
+                <text x="18"
+                      y="${H / 2}"
+                      text-anchor="middle"
+                      font-size="14"
+                      fill="${COLORS.dark}"
+                      transform="rotate(-90 18 ${H / 2})">
+                    ${yLabel}
+                </text>
+
+            `;
+
+            svg.innerHTML = out;
+        }
+
+        /* CONTROLS */
+
+        function controls(p) {
+            $("mValue").textContent = fmt(p.m, 2) + " kg";
+            $("bValue").textContent = fmt(p.b, 2) + " N·s/m";
+            $("kValue").textContent = fmt(p.k, 2) + " N/m";
+
+            $("zetaValue").textContent = fmt(p.zeta);
+            $("wnValue").textContent = fmt(p.wn) + " rad/s";
+
+            const z = p.zeta, w = p.wn;
+            const eq = $("stepEquation");
+            if (z < 1 - 1e-9) {
+                const wd = w * Math.sqrt(1 - z*z);
+                eq.textContent = `x(t) = (1/k)[1 − e^(−ζωₙt)(cos(ωdt) + ζ/√(1−ζ²) sin(ωdt))], ωd = ${fmt(wd)} rad/s`;
+            } else if (Math.abs(z-1) <= 1e-9) {
+                eq.textContent = "x(t) = (1/k)[1 − (1 + ωₙt)e^(−ωₙt)]";
+            } else {
+                eq.textContent = "x(t) = (1/k)[1 + (r₂e^(r₁t) − r₁e^(r₂t))/(r₁ − r₂)], r₁,₂ = −ωₙ(ζ ∓ √(ζ²−1))";
+            }
+            $("dampingCase").textContent =
+                p.zeta < 1 - 1e-9
+                    ? "Underdamped"
+                    : Math.abs(p.zeta - 1) <= 1e-9
+                        ? "Critically Damped"
+                        : "Overdamped";
+        }
+
+        /* STEP RESPONSE */
+
+        function responsePlot(p) {
+            const d = samples(p);
+            const m = metrics(p, d);
+
+            const displacement = d.y.map(value => value / p.k);
+            const finalValue = 1 / p.k;
+
+            drawGraph(
+                "responsePlot",
+                [
+                    {
+                        x: d.t,
+                        y: displacement,
+                        type: "line",
+                        color: COLORS.green
+                    },
+                    {
+                        x: [0, d.end],
+                        y: [finalValue, finalValue],
+                        type: "line",
+                        color: "#94b8a7"
+                    }
+                ],
+                "Time (s)",
+                "Displacement x(t) (m)",
+                {
+                    xmin: 0,
+                    xmax: d.end,
+                    ymin: 0,
+                    ymax: Math.max(finalValue * 1.15, m.peak / p.k * 1.12)
+                }
+            );
+
+            const cards = [
+                [
+                    "Rise Time (10–90%)",
+                    m.rise === null ? "Not reached" : fmt(m.rise) + " s"
+                ],
+                [
+                    "Peak Time",
+                    m.peakTime === null ? "N/A" : fmt(m.peakTime) + " s"
+                ],
+                [
+                    "Overshoot",
+                    fmt(m.overshoot, 2) + "%"
+                ],
+                [
+                    "Settling Time (2%)",
+                    m.settling === null
+                        ? (p.zeta < 1e-10 ? "Does not settle" : "Not reached in plot")
+                        : fmt(m.settling) + " s"
+                ]
+            ];
+
+            $("metricCards").innerHTML = cards.map(c => `
+                <div class="stat">
+                    <div class="stat-label">${c[0]}</div>
+                    <div class="stat-value">${c[1]}</div>
+                </div>
+            `).join("");
+
+            $("metricNote").textContent =
+                "Metrics are relative to x(∞) = 1/k. Rise time is 10–90% (interpolated); peak time and overshoot use the theoretical first peak, checked against the curve. Settling time uses the last ±2% boundary crossing; undamped systems never settle.";
+        }
+
+        /* POLES */
+
+        function polePlot(p) {
+            const r = roots(p);
+
+            const extent = Math.max(
+                1,
+                ...r.map(a => Math.abs(a.re) * 1.4),
+                ...r.map(a => Math.abs(a.im) * 1.4)
+            );
+
+            const labels = r.map((a, i) =>
+                `P${i + 1} = ${fmt(a.re, 3)} ${a.im >= 0 ? "+" : "−"} j${fmt(Math.abs(a.im), 3)}`
+            );
+
+            drawGraph(
+                "polePlot",
+                [{
+                    x: r.map(a => a.re),
+                    y: r.map(a => a.im),
+                    type: "points",
+                    color: COLORS.green,
+                    labels
+                }],
+                "Real axis σ (1/s)",
+                "Imaginary axis jω (rad/s)",
+                {
+                    xmin: -extent,
+                    xmax: extent,
+                    ymin: -extent,
+                    ymax: extent
+                }
+            );
+
+            $("poleCards").innerHTML = r.map((a, i) => `
+                <div class="stat">
+                    <div class="stat-label">Pole / Eigenvalue ${i + 1}</div>
+                    <div class="stat-value">
+                        ${fmt(a.re)} ${a.im >= 0 ? "+" : "−"} j${fmt(Math.abs(a.im))}
+                    </div>
+                    <div class="stat-note">Same value as eigenvalue of A</div>
+                </div>
+            `).join("");
+        }
+
+        // Independent state-space eigenvalues from trace(A), det(A).
+        function eigenvaluesFromMatrix(p) {
+            const a11 = 0, a12 = 1, a21 = -p.k / p.m, a22 = -p.b / p.m;
+            const tr = a11 + a22, det = a11*a22 - a12*a21;
+            const disc = tr*tr - 4*det;
+            if (disc < -1e-10) {
+                const im = Math.sqrt(-disc)/2;
+                return [{re:tr/2, im}, {re:tr/2, im:-im}];
+            }
+            const q = Math.sqrt(Math.max(0, disc))/2;
+            return [{re:tr/2+q, im:0}, {re:tr/2-q, im:0}];
+        }
+
+        /* STATE SPACE AND PHASE PLANE */
+
+        function trajectory(p) {
+            const t = sampleTimes(p, 1200);
+
+            const xs = t.map(ti => response(ti, p) / p.k);
+            const vs = t.map(ti => responseDerivative(ti, p) / p.k);
+
+            return {
+                xs,
+                vs
+            };
+        }
+
+        function stateSpace(p) {
+            $("matrixA").textContent =
+                `[ 0                 1 ]
+[ ${fmt(-p.k / p.m, 4)}       ${fmt(-p.b / p.m, 4)} ]`;
+
+            $("matrixB").textContent =
+                `[ 0 ]
+[ ${fmt(1 / p.m, 4)} ]`;
+
+            // The homework defines the output as y = x1.
+            $("matrixC").textContent = "[ 1   0 ]";
+
+            const r = eigenvaluesFromMatrix(p);
+
+            $("eigenValues").textContent = r.map(a =>
+                `${fmt(a.re, 4)} ${a.im >= 0 ? "+" : "−"} j${fmt(Math.abs(a.im), 4)}`
+            ).join("\n");
+
+            const t = trajectory(p);
+            const arrowIndex = Math.floor(t.xs.length * 0.23);
+            const nextArrowIndex = Math.min(t.xs.length - 1, arrowIndex + 8);
+
+            drawGraph(
+                "phasePlot",
+                [{
+                    x: t.xs,
+                    y: t.vs,
+                    type: "line",
+                    color: COLORS.purple
+                }, {
+                    x: [0, 1 / p.k],
+                    y: [0, 0],
+                    type: "points",
+                    color: COLORS.green,
+                    labels: ["Start", "Equilibrium"]
+                }, {
+                    x: [t.xs[arrowIndex], t.xs[nextArrowIndex]],
+                    y: [t.vs[arrowIndex], t.vs[nextArrowIndex]],
+                    type: "arrow",
+                    color: COLORS.purple
+                }],
+                "Displacement x₁ = x (m)",
+                "Velocity x₂ = dx/dt (m/s)"
+            );
+        }
+
+        /* VALIDATION */
+
+        function validation() {
+            const rows = [];
+
+            function addCheck(name, expected, calculated, passed) {
+                rows.push(`
+                    <tr>
+                        <td>${name}</td>
+                        <td>${expected}</td>
+                        <td>${calculated}</td>
+                        <td>
+                            ${passed
+                                ? '<span class="status pass">PASS</span>'
+                                : '<span class="status" style="background:#fee2e2;color:#b91c1c">FAIL</span>'
+                            }
+                        </td>
+                    </tr>
+                `);
+            }
+
+            // Validation 4: ζ = 0.5 gives 16.3% overshoot.
+            const under = {
+                m: 1,
+                b: 2,
+                k: 4,
+                wn: 2,
+                zeta: 0.5
+            };
+
+            const underData = samples(under);
+            const underMeasured = Math.max(...underData.y);
+            const measuredOS = Math.max(0, (underMeasured - 1) * 100);
+
+            const expectedOS = Math.exp(
+                -Math.PI * under.zeta /
+                Math.sqrt(1 - under.zeta * under.zeta)
+            ) * 100;
+
+            addCheck(
+                "4. Second-order overshoot (ζ = 0.5)",
+                "16.3%",
+                `${fmt(measuredOS, 2)}% (curve); theoretical ${fmt(expectedOS, 2)}%`,
+                Math.abs(expectedOS - 16.3) < 0.15 &&
+                Math.abs(measuredOS - expectedOS) < 0.25
+            );
+
+            // Validation 5: ζ = 1 has no overshoot.
+            const critical = {
+                m: 1,
+                b: 4,
+                k: 4,
+                wn: 2,
+                zeta: 1
+            };
+
+            const criticalData = samples(critical);
+            const criticalPeak = Math.max(...criticalData.y);
+            const criticalOS = Math.max(0, (criticalPeak - 1) * 100);
+
+            addCheck(
+                "5. Second-order response (ζ = 1)",
+                "No overshoot",
+                `${fmt(criticalOS, 4)}% overshoot`,
+                criticalOS < 0.01
+            );
+
+            // Validation 6: eigenvalues equal the poles.
+            const known = {
+                m: 1,
+                b: 2,
+                k: 4,
+                wn: 2,
+                zeta: 0.5
+            };
+
+            const expectedRoots = roots(known);
+            // Independently derive eigenvalues from det(lambda I - A) = 0.
+            const a11 = 0, a12 = 1, a21 = -known.k / known.m, a22 = -known.b / known.m;
+            const trace = a11 + a22;
+            const determinant = a11 * a22 - a12 * a21;
+            const disc = trace * trace - 4 * determinant;
+            const eigenRoots = eigenvaluesFromMatrix(known);
+            const polesMatchEigenvalues = expectedRoots.every((r, i) =>
+                Math.abs(r.re - eigenRoots[i].re) < 1e-9 &&
+                Math.abs(r.im - eigenRoots[i].im) < 1e-9);
+
+            const eigenvalueText =
+                `${fmt(expectedRoots[0].re, 3)} ± j${fmt(Math.abs(expectedRoots[0].im), 3)}`;
+
+            const eigenvalueOK =
+                Math.abs(expectedRoots[0].re + 1) < 1e-9 &&
+                Math.abs(expectedRoots[1].re + 1) < 1e-9 &&
+                Math.abs(Math.abs(expectedRoots[0].im) - Math.sqrt(3)) < 1e-9 &&
+                Math.abs(Math.abs(expectedRoots[1].im) - Math.sqrt(3)) < 1e-9;
+
+            addCheck(
+                "6. State-space eigenvalues (m = 1, b = 2, k = 4)",
+                "−1 ± j1.732; equal to poles",
+                eigenvalueText + "; poles match",
+                eigenvalueOK && polesMatchEigenvalues
+            );
+
+            $("validationRows").innerHTML = rows.join("");
+        }
+
+        /* PREDICT THEN CHECK */
+
+        const questions = [
+            {
+                prompt: "With m = 1 and k = 4, what happens to overshoot when b increases from 2 to 4?",
+                options: [
+                    "Overshoot decreases to zero",
+                    "Overshoot increases",
+                    "The steady-state displacement changes"
+                ],
+                correct: 0,
+                why: "ζ rises from 0.5 to 1, eliminating overshoot; ωn and the final displacement remain unchanged."
+            },
+            {
+                prompt: "What happens when ζ changes from 0.5 to 1?",
+                options: [
+                    "Overshoot decreases to zero",
+                    "Overshoot increases",
+                    "Overshoot stays the same"
+                ],
+                correct: 0,
+                why: "At ζ = 1, the system is critically damped and has no overshoot."
+            },
+            {
+                prompt: "What happens to natural frequency when k increases and m stays fixed?",
+                options: [
+                    "It increases",
+                    "It decreases",
+                    "It stays the same"
+                ],
+                correct: 0,
+                why: "ωn = √(k/m), so increasing k increases natural frequency."
+            },
+            {
+                prompt: "Where are the poles of an underdamped second-order system?",
+                options: [
+                    "A complex-conjugate pair",
+                    "Both on the positive real axis",
+                    "At the origin"
+                ],
+                correct: 0,
+                why: "For 0 < ζ < 1, poles have negative real parts and opposite imaginary parts (at ζ = 0 they lie on the imaginary axis)."
+            }
+        ];
+
+        let questionIndex = 0;
+        let selected = null;
+        let locked = false;
+
+        function loadQuestion() {
+            const q = questions[questionIndex % questions.length];
+
+            $("predictionPrompt").textContent = q.prompt;
+            $("predictionAnswers").innerHTML = "";
+
+            selected = null;
+            locked = false;
+
+            $("predictionFeedback").className = "feedback";
+            $("predictionFeedback").textContent = "";
+
+            q.options.forEach((option, i) => {
+                const button = document.createElement("button");
+
+                button.className = "answer";
+                button.textContent = option;
+
+                button.addEventListener("click", () => {
+                    if (locked) return;
+
+                    selected = i;
+
+                    document.querySelectorAll(".answer").forEach((el, j) => {
+                        el.classList.toggle("selected", i === j);
+                    });
+                });
+
+                $("predictionAnswers").appendChild(button);
+            });
+        }
+
+        function checkQuestion() {
+            const q = questions[questionIndex % questions.length];
+            const feedback = $("predictionFeedback");
+
+            if (selected === null) {
+                feedback.className = "feedback visible error";
+                feedback.textContent = "Please select an answer first.";
+                return;
+            }
+
+            locked = true;
+
+            document.querySelectorAll(".answer").forEach((el, i) => {
+                el.disabled = true;
+
+                if (i === q.correct) {
+                    el.classList.add("correct");
+                } else if (i === selected) {
+                    el.classList.add("wrong");
+                }
+            });
+
+            const correct = selected === q.correct;
+
+            feedback.className = "feedback visible" + (correct ? "" : " error");
+            feedback.textContent = (correct ? "Correct! " : "Not quite. ") + q.why;
+        }
+
+        /* UPDATE EVERYTHING */
+
+        function update() {
+            const p = params();
+
+            controls(p);
+            responsePlot(p);
+            polePlot(p);
+            stateSpace(p);
+        }
+
+        ["mSlider", "bSlider", "kSlider"].forEach(id => {
+            $(id).addEventListener("input", () => {
+                state.m = Number($("mSlider").value);
+                state.b = Number($("bSlider").value);
+                state.k = Number($("kSlider").value);
+
+                update();
+            });
+        });
+
+        function setPreset(b) {
+            Object.assign(state, {m: 1, b, k: 4});
+            $("mSlider").value = 1;
+            $("bSlider").value = b;
+            $("kSlider").value = 4;
+            update();
+        }
+        $("underPreset").addEventListener("click", () => setPreset(2));
+        $("criticalPreset").addEventListener("click", () => setPreset(4));
+        $("overPreset").addEventListener("click", () => setPreset(8));
+        $("applyExperiment").addEventListener("click", () => {
+            if (!locked) {
+                const feedback = $("predictionFeedback");
+                feedback.className = "feedback visible error";
+                feedback.textContent = "Choose a prediction and press Check Prediction first.";
+                return;
+            }
+            setPreset(4);
+            $("predictionFeedback").textContent += " Live check: m=1, b=4, k=4; overshoot is now 0%.";
+        });
+
+        $("resetButton").addEventListener("click", () => {
+            Object.assign(state, {
+                m: 1,
+                b: 2,
+                k: 4
+            });
+
+            $("mSlider").value = 1;
+            $("bSlider").value = 2;
+            $("kSlider").value = 4;
+
+            update();
+        });
+
+        $("checkPrediction").addEventListener("click", checkQuestion);
+
+        $("nextQuestion").addEventListener("click", () => {
+            questionIndex++;
+            loadQuestion();
+        });
+
+        window.addEventListener("load", () => {
+            update();
+            validation();
+            loadQuestion();
+        });
+
+    </script>
+
+</body>
+</html>

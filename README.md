@@ -24,7 +24,8 @@ An interactive web-based toolkit developed for ENCS4380 – Interfacing Techniqu
 - Amplitude ratio, phase lag, cutoff frequency, and dynamic error calculations.
 - Sine-wave and Bode plots.
 - Dynamic error calculator, prediction activity, and validation checks.
-
+**Live Demo:** https://razantartir28.github.io/encs4380-dynamics-BumbleBee/module2.html
+  
 ## Module 3
 To be completed.
 

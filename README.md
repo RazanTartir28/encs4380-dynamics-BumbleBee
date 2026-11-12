@@ -26,8 +26,20 @@ An interactive web-based toolkit developed for ENCS4380 – Interfacing Techniqu
 - Dynamic error calculator, prediction activity, and validation checks.
 **Live Demo:** https://razantartir28.github.io/encs4380-dynamics-BumbleBee/module2.html
   
-## Module 3
-To be completed.
+## Module 3: Second-Order System Response
+
+**Responsible Member:** Dana Abed Alfattah (1231169)
+
+- Interactive mass-spring-damper system simulation.
+- Adjustable mass (m), damping coefficient (b), and spring stiffness (k).
+- Step response visualization with rise time, peak time, overshoot, and settling time.
+- Visualization of system poles in the s-plane.
+- State-space representation, eigenvalues, and phase-plane trajectory.
+- Underdamped, critically damped, and overdamped response comparisons.
+- Interactive prediction questions with immediate feedback.
+- Validation checks for overshoot, critical damping, and eigenvalues.
+
+ https://razantartir28.github.io/encs4380-dynamics-BumbleBee/module3.html
 
 ## Module 4 – Guess the Sensor Challenge
 **Responsible Member:** Suad Jamal (1232045)
@@ -43,10 +55,10 @@ To be completed.
 - Razan Tartir
 - Malak Rabee
 - Suad Jamal
-- Dana Shojaeia
+- Dana Abed Alfattah
 
 ## Module Responsibilities
 - Module 1: Razan Tartir (1230922)
 - Module 2: Malak Rabee (1231479)
-- Module 3: To be assigned
+- Module 3: Dana Abed Alfattah (1231169)
 - Module 4: Suad Jamal (1232045)

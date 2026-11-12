@@ -29,8 +29,15 @@ An interactive web-based toolkit developed for ENCS4380 – Interfacing Techniqu
 ## Module 3
 To be completed.
 
-## Module 4
-To be completed.
+## Module 4 – Guess the Sensor Challenge
+**Responsible Member:** Suad Jamal (1232045)
+- Randomly generated hidden sensor parameters
+- First-order step and sinusoidal responses
+- Second-order step responses
+- Noisy sensor measurements
+- Parameter estimation and relative-error scoring
+- Hints, answer reveal, and session score tracking
+- https://razantartir28.github.io/encs4380-dynamics-BumbleBee/module4.html 
 
 ## Team Members
 - Razan Tartir
@@ -42,4 +49,4 @@ To be completed.
 - Module 1: Razan Tartir (1230922)
 - Module 2: Malak Rabee (1231479)
 - Module 3: To be assigned
-- Module 4: To be assigned
+- Module 4: Suad Jamal (1232045)

@@ -15,6 +15,7 @@ An interactive web-based toolkit developed for ENCS4380 – Interfacing Techniqu
 - Adjustable sensor gain (K) and time constant (τ).
 - Response graphs and logarithmic error analysis.
 - Prediction exercises and validation checks.
+- https://razantartir28.github.io/encs4380-dynamics-BumbleBee/
 
 ## Module 2: First-Order Frequency Response
 **Responsible Member:** Malak Rabee (1231479)

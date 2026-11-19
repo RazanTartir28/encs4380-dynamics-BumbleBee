@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Control | BumbleBee</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font: 1rem/1.6 "Segoe UI", Arial, sans-serif;
+            color: #173d30;
+            background: #f3faf6;
+        }
+        .container { max-width: 1250px; margin: auto; }
+        header {
+            padding: 38px 24px;
+            color: white;
+            background: linear-gradient(120deg, #064e3b, #047857, #059669);
+        }
+        header h1 { margin: 0 0 8px; font-size: clamp(25px, 3vw, 37px); }
+        header p { margin: 4px 0; color: #d1fae5; }
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 6px 24px;
+            padding: 14px 20px;
+            background: #064e3b;
+        }
+        nav a { color: white; font-weight: 700; text-decoration: none; }
+        nav a:hover, nav a[aria-current="page"] {
+            text-decoration: underline;
+            text-underline-offset: 4px;
+        }
+        a:focus-visible { outline: 3px solid #059669; outline-offset: 5px; }
+        main { padding: 30px 20px 50px; }
+        .modules {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+            gap: 22px;
+        }
+        .card {
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+            padding: 24px;
+            border: 1px solid #d1e7db;
+            border-radius: 14px;
+            background: white;
+            box-shadow: 0 8px 24px #064e3b08;
+        }
+        .card h2 { margin: 0 0 12px; color: #064e3b; font-size: 1.25rem; }
+        .card p { margin: 0 0 22px; color: #647d70; }
+        .button, .status { margin-top: auto; border-radius: 6px; padding: 9px 16px; }
+        .button { background: #047857; color: white; font-weight: 700; text-decoration: none; }
+        .button:hover { background: #064e3b; }
+        .status { background: #eef6f1; color: #647d70; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>PID Control Toolkit</h1>
+            <p>Dynamic Characteristics Interactive Toolkit</p>
+            <p>Homework 2 — ENCS4380 Interfacing Techniques</p>
+            <p>Birzeit University | BumbleBee</p>
+        </div>
+    </header>
+    <nav aria-label="Module navigation">
+        <a href="../index.html">Module 1: Time Response</a>
+        <a href="../module2.html">Module 2: Frequency Response</a>
+        <a href="../module3.html">Module 3: Second-Order Response</a>
+        <a href="../module4.html">Module 4: Guess the Sensor</a>
+        <a href="index.html" aria-current="page">Control</a>
+    </nav>
+    <main class="container">
+        <div class="modules">
+            <article class="card">
+                <h2>P1 — PID Playground</h2>
+                <p>Explore P, I and D with first-order and second-order plants, response metrics and control limits.</p>
+                <a class="button" href="p1.html">Open P1</a>
+            </article>
+            <article class="card">
+                <h2>P2 — A Slow Sensor in the Loop</h2>
+                <p>Compare the true output with the sensor reading as feedback becomes slower.</p>
+                <span class="status">Coming soon</span>
+            </article>
+            <article class="card">
+                <h2>P3 — Digital PID</h2>
+                <p>Explore sampling time, anti-windup and generated Arduino loop code.</p>
+                <span class="status">Coming soon</span>
+            </article>
+            <article class="card">
+                <h2>P4 — Tuning Challenge</h2>
+                <p>Tune the controller for a hidden plant and check each performance target.</p>
+                <span class="status">Coming soon</span>
+            </article>
+        </div>
+    </main>
+</body>
+</html>

@@ -354,6 +354,36 @@ footer {
     }
 }
   </style>
+    <style>
+        .toolkit-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 6px 24px;
+            padding: 14px 20px;
+            background: #064e3b;
+            text-align: center;
+        }
+
+        .toolkit-nav a {
+            max-width: 100%;
+            color: #fff;
+            font: 700 1rem/1.45 "Segoe UI", Arial, sans-serif;
+            text-decoration: none;
+        }
+
+        .toolkit-nav a:hover,
+        .toolkit-nav a[aria-current="page"] {
+            text-decoration: underline;
+            text-underline-offset: 4px;
+        }
+
+        .toolkit-nav a:focus-visible {
+            outline: 2px solid #d1fae5;
+            outline-offset: 3px;
+        }
+    </style>
  </head>
  <body>
   <header>
@@ -364,13 +394,13 @@ footer {
     <p>Birzeit University</p>
    </div>
   </header>
-  <nav aria-label="Module navigation" class="module-nav">
-   <a href="index.html">Module 1: Time Response</a>
-   <a aria-current="page" href="module2.html">Module 2: Frequency Response</a>
-  
-  <a href="module3.html">Module 3: Second-Order Response</a>
-  <a href="module4.html">Module 4: Guess the Sensor</a>
-</nav>
+    <nav class="toolkit-nav" aria-label="Module navigation">
+        <a href="index.html">Module 1: Time Response</a>
+        <a href="module2.html" aria-current="page">Module 2: Frequency Response</a>
+        <a href="module3.html">Module 3: Second-Order Response</a>
+        <a href="module4.html">Module 4: Guess the Sensor</a>
+        <a href="control/index.html">Control</a>
+    </nav>
   <main class="container">
    <div class="layout">
     <aside class="sidebar">

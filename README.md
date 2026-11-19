@@ -63,3 +63,25 @@ An interactive web-based toolkit developed for ENCS4380 – Interfacing Techniqu
 - Module 2: Malak Rabee (1231479)
 - Module 3: Dana Abed Alfattah (1231169)
 - Module 4: Suad Jamal (1232045)
+
+- ## Homework 2 — PID Control Toolkit
+
+### P1 — PID Playground
+
+**Owner:** Suad Jamal (1232045)
+
+[Open P1](https://razantartir28.github.io/encs4380-dynamics-BumbleBee/control/p1.html)
+
+- First-order and second-order plant selection.
+- Adjustable PID gains and setpoint.
+- Output and setpoint plot.
+- Requested and applied control signals with limits.
+- Live response metrics.
+- Closed-loop block diagram.
+- Predict, then check activity.
+- P-only and PI validation checks.
+
+### AI assistance
+
+ChatGPT assisted with code development, explanations, debugging,
+navigation styling and validation checks for P1.

@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>P2 - A Slow Sensor in the Loop</title>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f3faf6;
+            color: #173d30;
+            line-height: 1.6;
+        }
+
+        .toolkit-header {
+            padding: 38px 24px;
+            color: #fff;
+            background: linear-gradient(120deg, #064e3b, #047857, #059669);
+        }
+
+        .toolkit-container, main {
+            max-width: 1250px;
+            margin: auto;
+        }
+
+        .toolkit-header h1 {
+            margin: 0 0 8px;
+            font-size: clamp(25px, 3vw, 37px);
+        }
+
+        .toolkit-header p {
+            margin: 4px 0;
+            color: #d1fae5;
+        }
+
+        main { padding: 25px 20px 50px; }
+
+        .panel {
+            padding: 16px;
+            background: #fff;
+            border: 1px solid #d1e7db;
+            border-radius: 10px;
+        }
+
+        .panel h2 {
+            margin-top: 0;
+        }
+
+        .controls, #metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+            gap: 12px;
+        }
+
+        .controls label {
+            display: grid;
+            gap: 6px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: #059669;
+        }
+
+        .diagram {
+            margin: 16px 0;
+        }
+
+        .flow {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            padding: 0;
+            list-style: none;
+        }
+
+        .flow li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .flow li + li::before {
+            content: "→";
+            color: #257354;
+        }
+
+        .block {
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid #7caa97;
+            border-radius: 6px;
+        }
+
+        .feedback {
+            border-left: 3px solid #257354;
+            padding-left: 10px;
+        }
+
+        .plot {
+            min-height: 360px;
+            margin: 12px 0;
+        }
+
+        #metrics p {
+            margin: 0;
+        }
+
+        select, button {
+            font: inherit;
+        }
+
+        button {
+            padding: 8px 12px;
+            border: 0;
+            border-radius: 6px;
+            background: #047857;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+    <style>
+        .toolkit-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 6px 24px;
+            padding: 14px 20px;
+            background: #064e3b;
+            text-align: center;
+        }
+
+        .toolkit-nav a {
+            max-width: 100%;
+            color: #fff;
+            font: 700 1rem/1.45 "Segoe UI", Arial, sans-serif;
+            text-decoration: none;
+        }
+
+        .toolkit-nav a:hover,
+        .toolkit-nav a[aria-current="page"] {
+            text-decoration: underline;
+            text-underline-offset: 4px;
+        }
+
+        .toolkit-nav a:focus-visible {
+            outline: 2px solid #d1fae5;
+            outline-offset: 3px;
+        }
+
+        /* Module 2-inspired responsive explanation cards */
+        .sensor-learning { margin: 18px 0; }
+        .sensor-learning > h2 { margin: 0 0 8px; }
+        .sensor-learning > .learning-intro { margin: 0 0 18px; color: #647d70; }
+        .sensor-learning-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+        .sensor-learning-card {
+            background: #fff;
+            border: 1px solid #d1e7db;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 18px rgba(6, 78, 59, .05);
+            min-width: 0;
+        }
+        .sensor-learning-card h3 {
+            margin: 0 0 10px;
+            color: #064e3b;
+            font-size: 17px;
+        }
+        .sensor-learning-card p { margin: 0; }
+        .sensor-learning-card .learning-note {
+            margin-top: 12px;
+            padding: 12px 14px;
+            background: #ecfdf5;
+            border-left: 4px solid #059669;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        @media (max-width: 700px) {
+            .sensor-learning-grid { grid-template-columns: 1fr; }
+            .sensor-learning-card { padding: 16px; }
+        }
+    </style>
+<style>
+        /* Entire P2 workspace: controls remain visible beside the live response. */
+        .simulation-workspace {
+            display: grid;
+            grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+            gap: 18px;
+            align-items: start;
+            margin-bottom: 18px;
+        }
+        .simulation-workspace .controls {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 14px;
+            position: sticky;
+            top: 12px;
+        }
+        .controls-heading { margin: 0; font-size: 1.3rem; }
+        .simulation-workspace .controls label { min-width: 0; }
+        .simulation-workspace select { width: 100%; padding: 7px; }
+        .live-response { min-width: 0; }
+        .live-response h2 { margin: 0 0 4px; }
+        .live-response .plot { min-height: 410px; margin: 0; }
+        .results-workspace {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 12px;
+            margin: 18px 0;
+            align-items: start;
+        }
+        .results-workspace #metrics {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            align-items: center;
+        }
+        @media (max-width: 950px) {
+            .results-workspace #metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        /* Metrics above; diagram and control curve share the next row. */
+        .results-detail-row {
+            display: grid;
+            grid-template-columns: minmax(300px, 0.9fr) minmax(0, 1.5fr);
+            gap: 14px;
+            align-items: stretch;
+        }
+        .results-detail-row .diagram { margin: 0; min-width: 0; }
+        .results-detail-row .flow { align-items: flex-start; }
+        .results-detail-row .flow li { max-width: 100%; }
+        .results-detail-row .block { font-size: 0.93rem; }
+        .results-detail-row .control-plot-panel { min-width: 0; }
+        @media (max-width: 1000px) {
+            .results-detail-row { grid-template-columns: minmax(0, 1fr); }
+        }
+        .control-plot-panel { min-width: 0; }
+        .control-plot-panel .plot { margin: 0; }
+        @media (max-width: 780px) {
+            .simulation-workspace, .results-workspace { grid-template-columns: minmax(0, 1fr); }
+            .simulation-workspace .controls { position: static; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .controls-heading { grid-column: 1 / -1; }
+        }
+        @media (max-width: 470px) {
+            .simulation-workspace .controls { grid-template-columns: minmax(0, 1fr); }
+            .results-workspace #metrics { grid-template-columns: minmax(0, 1fr); }
+        }
+</style>
+</head>
+<body>
+    <header class="toolkit-header">
+        <div class="toolkit-container">
+            <h1>P2 — A Slow Sensor in the Loop</h1>
+            <p>Dynamic Characteristics Interactive Toolkit</p>
+            <p>Homework 2 — ENCS4380 Interfacing Techniques</p>
+            <p>Birzeit University | BumbleBee</p>
+        </div>
+    </header>
+
+    <nav class="toolkit-nav" aria-label="Control navigation">
+        <a href="../index.html">← Back to Modules</a>
+        <a href="index.html">Control</a>
+        <a href="p1.html">P1: PID Playground</a>
+        <a href="p2.html" aria-current="page">P2: Slow Sensor</a>
+    </nav>
+
+    <main>
+        <section class="simulation-workspace" aria-label="Interactive PID simulation">
+        <div class="controls panel">
+            <h2 class="controls-heading">PID &amp; Sensor Controls</h2>
+            <label>
+                Plant model
+                <select id="plantSelect">
+                    <option value="first-order">First-order</option>
+                    <option value="second-order" selected>Second-order</option>
+                </select>
+            </label>
+
+            <label>
+                <span>Proportional gain Kp: <output id="kpValue">1.0</output></span>
+                <input id="kpSlider" type="range" min="0" max="10" step="0.1" value="1">
+            </label>
+
+            <label>
+                <span>Integral gain Ki: <output id="kiValue">1.0</output></span>
+                <input id="kiSlider" type="range" min="0" max="3" step="0.1" value="1">
+            </label>
+
+            <label>
+                <span>Derivative gain Kd: <output id="kdValue">0.50</output></span>
+                <input id="kdSlider" type="range" min="0" max="0.8" step="0.05" value="0.5">
+            </label>
+
+            <label>
+                <span>Setpoint: <output id="setpointValue">1.0</output></span>
+                <input id="setpointSlider" type="range" min="0.1" max="1.5" step="0.1" value="1">
+            </label>
+            <label>
+                <span>Sensor time constant τs: <output id="sensorValue">0.20</output> s</span>
+                <input id="sensorSlider" type="range" min="0" max="3" step="0.05" value="0.2">
+            </label>
+        </div>
+
+        <div class="live-response panel">
+            <h2>Live Response</h2>
+        <div id="responsePlot" class="plot"></div>
+        </div>
+        </section>
+
+        <section class="results-workspace" aria-label="Response metrics and control diagram">
+        <section id="metrics" class="panel" aria-label="Response metrics">
+            <p id="errorResult"></p>
+            <p id="overshootResult"></p>
+            <p id="riseResult"></p>
+            <p id="settlingResult"></p>
+        </section>
+            <div class="results-detail-row">
+        <section class="diagram panel" aria-labelledby="diagramTitle">
+            <h2 id="diagramTitle">Closed-loop block diagram</h2>
+            <ol class="flow">
+                <li><span class="block">Setpoint r</span></li>
+                <li><span class="block">Compare: e = r − ym</span></li>
+                <li><span class="block">PID</span></li>
+                <li><span class="block">Control limits</span></li>
+                <li><span class="block">Plant → true output y</span></li>
+                <li><span class="block">Sensor τs → measured ym</span></li>
+            </ol>
+            <p class="feedback"><strong>Feedback:</strong> the sensor reading ym (not true output y) returns to the comparator and is subtracted from r.</p>
+        </section>
+                <div class="panel control-plot-panel"><div id="controlPlot" class="plot"></div></div>
+            </div>
+        </section>
+
+        <section class="sensor-learning" aria-labelledby="sensorExplanationTitle">
+            <h2 id="sensorExplanationTitle">Understanding Sensor Delay</h2>
+            <p class="learning-intro">Explore how sensor speed changes feedback and the PID-controlled response.</p>
+            <div class="sensor-learning-grid">
+                <article class="sensor-learning-card">
+                    <h3>1. Ideal Sensor (τs = 0 s)</h3>
+                    <p>The measured output follows the true plant output without sensor delay, so the two curves overlap.</p>
+                    <div class="learning-note">Compare the two curves at τs = 0 s.</div>
+                </article>
+                <article class="sensor-learning-card">
+                    <h3>2. Slow Sensor (τs &gt; 0 s)</h3>
+                    <p>The sensor behaves as a first-order system. During a rising response, its reported value initially lags behind the true output. Increasing τs generally increases this delay.</p>
+                </article>
+                <article class="sensor-learning-card">
+                    <h3>3. Why Overshoot Can Increase</h3>
+                    <p>The PID uses the measured output to calculate error: e = setpoint − measured output. A delayed reading can keep the controller requesting a strong action even after the true output has risen substantially.</p>
+                </article>
+                <article class="sensor-learning-card">
+                    <h3>4. Why Oscillations Can Occur</h3>
+                    <p>Delayed feedback can make the controller react too late and repeatedly overcorrect. Oscillation depends on PID gains, plant dynamics, sensor delay, and control limits.</p>
+                </article>
+                <article class="sensor-learning-card">
+                    <h3>5. Try It Yourself</h3>
+                    <p>Choose the first-order plant with Kp = 1, Ki = 1, Kd = 0, and setpoint = 0.5. Compare τs = 0, 0.5, and 2 s. Watch the true and measured curves, peak, and settling behavior.</p>
+                </article>
+                <article class="sensor-learning-card">
+                    <h3>6. Simulation Note</h3>
+                    <p>The applied control is limited to 0–0.8. This can affect overshoot, oscillation, and whether the output reaches the setpoint. Not every gain setting will oscillate.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="panel" aria-labelledby="predictionTitle">
+            <h2 id="predictionTitle">Predict, then check — Slow sensor</h2>
+            <p>Before running the test, predict what happens when the sensor time constant increases from 0 s (ideal sensor) to 2 s. The test uses a first-order plant, Kp = 1, Ki = 1, Kd = 0, and setpoint = 0.5.</p>
+            <label for="prediction">During the initial rise, what will the sensor report?</label>
+            <select id="prediction">
+                <option value="">Choose an answer</option>
+                <option value="same">The measured output always matches the true output.</option>
+                <option value="lag">The measured output lags behind the true output.</option>
+                <option value="lead">The measured output rises ahead of the true output.</option>
+            </select>
+            <button id="checkPrediction" type="button">Check and run</button>
+            <p id="predictionResult" role="status" aria-live="polite"></p>
+        </section>
+    </main>
+
+    <script>
+        const plantSelect = document.getElementById("plantSelect");
+        const kpSlider = document.getElementById("kpSlider");
+        const kiSlider = document.getElementById("kiSlider");
+        const kdSlider = document.getElementById("kdSlider");
+        const setpointSlider = document.getElementById("setpointSlider");
+        const sensorSlider = document.getElementById("sensorSlider");
+
+        function drawPlot(id, traces, title, yLabel) {
+            Plotly.react(id, traces, {
+                height: 360,
+                margin: { l: 64, r: 24, t: 76, b: 56 },
+                legend: { orientation: "h", y: 1.06 },
+                title: { text: title },
+                xaxis: { title: { text: "Time (s)" } },
+                yaxis: { title: { text: yLabel } }
+            }, { responsive: true });
+        }
+
+        function updateSimulation() {
+            const plant = plantSelect.value;
+            const Kp = Number(kpSlider.value);
+            const Ki = Number(kiSlider.value);
+            const Kd = Number(kdSlider.value);
+            const setpoint = Number(setpointSlider.value);
+            const sensorTau = Number(sensorSlider.value);
+
+            document.getElementById("kpValue").textContent = Kp.toFixed(1);
+            document.getElementById("kiValue").textContent = Ki.toFixed(1);
+            document.getElementById("kdValue").textContent = Kd.toFixed(2);
+            document.getElementById("setpointValue").textContent = setpoint.toFixed(1);
+            document.getElementById("sensorValue").textContent = sensorTau.toFixed(2);
+
+            const K = 1;
+            const tau = 1;
+            const m = 1;
+            const b = 1;
+            const k = 1;
+            const dt = 0.01;
+            const steps = 1000;
+            const duration = steps * dt;
+            const uMin = 0;
+            const uMax = 0.8;
+
+            let y = 0;
+            let measuredY = 0;
+            let velocity = 0;
+            let integral = 0;
+            let previousError = null;
+
+            const times = [0];
+            const outputs = [y];
+            const measuredOutputs = [measuredY];
+            const controlTimes = [];
+            const requestedControls = [];
+            const appliedControls = [];
+
+            for (let step = 1; step <= steps; step++) {
+                // The PID can only see the sensor reading, not the true plant output.
+                const error = setpoint - measuredY;
+                const pTerm = Kp * error;
+                const iTerm = Ki * integral;
+
+                let errorRate = 0;
+                if (previousError !== null) {
+                    errorRate = (error - previousError) / dt;
+                }
+
+                const dTerm = Kd * errorRate;
+                const rawU = pTerm + iTerm + dTerm;
+                const u = Math.min(uMax, Math.max(uMin, rawU));
+
+                controlTimes.push((step - 1) * dt);
+                requestedControls.push(rawU);
+                appliedControls.push(u);
+
+                if (plant === "first-order") {
+                    const rate = (K * u - y) / tau;
+                    y = y + dt * rate;
+                } else {
+                    const acceleration = (u - b * velocity - k * y) / m;
+                    y = y + dt * velocity;
+                    velocity = velocity + dt * acceleration;
+                }
+
+                // Exact update for a first-order sensor with y held constant over dt.
+                // tau_s = 0 means an ideal sensor with no delay.
+                measuredY = sensorTau === 0
+                    ? y
+                    : measuredY + (1 - Math.exp(-dt / sensorTau)) * (y - measuredY);
+
+                integral = integral + error * dt;
+                previousError = error;
+                times.push(step * dt);
+                outputs.push(y);
+                measuredOutputs.push(measuredY);
+            }
+
+            const initialOutput = outputs[0];
+            const finalOutput = outputs[outputs.length - 1];
+            const desiredChange = setpoint - initialOutput;
+            const errorPercent = ((setpoint - finalOutput) / setpoint) * 100;
+
+            document.getElementById("errorResult").textContent =
+                `Error at ${duration} s: ${errorPercent.toFixed(2)}%`;
+
+            const overshootResult = document.getElementById("overshootResult");
+            const riseResult = document.getElementById("riseResult");
+            const settlingResult = document.getElementById("settlingResult");
+
+            // Metrics are measured against the requested setpoint, not the
+            // possibly unfinished response at the end of the 10-second window.
+            if (desiredChange > 0) {
+                const peakOutput = Math.max(...outputs);
+                const overshoot = Math.max(0, ((peakOutput - setpoint) / desiredChange) * 100);
+                const level10 = initialOutput + 0.10 * desiredChange;
+                const level90 = initialOutput + 0.90 * desiredChange;
+                const index10 = outputs.findIndex(value => value >= level10);
+                const index90 = outputs.findIndex(value => value >= level90);
+
+                // Crossing both thresholds is required for a valid rise time.
+                const riseTime = index10 >= 0 && index90 >= index10
+                    ? times[index90] - times[index10]
+                    : null;
+
+                // Settled means inside the 2% setpoint band for the remainder
+                // of the simulation, including its final sample.
+                const tolerance = 0.02 * Math.abs(desiredChange);
+                const lastOutsideIndex = outputs.findLastIndex(
+                    value => Math.abs(value - setpoint) > tolerance
+                );
+                const settlingTime = lastOutsideIndex < outputs.length - 1
+                    ? times[lastOutsideIndex + 1]
+                    : null;
+
+                overshootResult.textContent = `Peak overshoot above setpoint: ${overshoot.toFixed(2)}%`;
+                riseResult.textContent = riseTime === null
+                    ? "Rise time (10–90% of setpoint): N/A (90% not reached)"
+                    : `Rise time (10–90% of setpoint): ${riseTime.toFixed(2)} s`;
+                settlingResult.textContent = settlingTime === null
+                    ? "Settling time (±2% of setpoint): N/A (not settled within 10 s)"
+                    : `Settling time (±2% of setpoint): ${settlingTime.toFixed(2)} s`;
+            } else {
+                overshootResult.textContent = "Overshoot unavailable";
+                riseResult.textContent = "Rise time unavailable";
+                settlingResult.textContent = "Settling time unavailable";
+            }
+
+            controlTimes.push(duration);
+            requestedControls.push(requestedControls[steps - 1]);
+            appliedControls.push(appliedControls[steps - 1]);
+
+            const outputTrace = {
+                x: times, y: outputs, mode: "lines", name: "True output (plant)"
+            };
+            const measuredTrace = {
+                x: times, y: measuredOutputs, mode: "lines", name: "Measured output (sensor)"
+            };
+            const setpointTrace = {
+                x: [0, duration], y: [setpoint, setpoint],
+                mode: "lines", name: "Setpoint", line: { dash: "dash" }
+            };
+
+            drawPlot("responsePlot", [outputTrace, measuredTrace, setpointTrace],
+                `Response — ${plant}`, "Output");
+
+            const appliedTrace = {
+                x: controlTimes, y: appliedControls, mode: "lines",
+                name: "Applied control", line: { shape: "hv", width: 3 }
+            };
+            const requestedTrace = {
+                x: controlTimes, y: requestedControls, mode: "lines",
+                name: "Requested control", line: { shape: "hv", dash: "dash" }
+            };
+            const upperLimitTrace = {
+                x: [0, duration], y: [uMax, uMax], mode: "lines",
+                name: "Upper limit", line: { color: "gray", dash: "dot" }
+            };
+            const lowerLimitTrace = {
+                x: [0, duration], y: [uMin, uMin], mode: "lines",
+                name: "Lower limit", line: { color: "gray", dash: "dot" }
+            };
+
+            drawPlot("controlPlot",
+                [upperLimitTrace, lowerLimitTrace, requestedTrace, appliedTrace],
+                "Control Signal and Limits", "Control signal (u)");
+
+            return { times, outputs, measuredOutputs };
+        }
+
+        function checkPrediction() {
+            const prediction = document.getElementById("prediction").value;
+            const result = document.getElementById("predictionResult");
+            if (!prediction) {
+                result.textContent = "Choose an answer first.";
+                return;
+            }
+
+            // Apply a reproducible test case and display its simulated response.
+            plantSelect.value = "first-order";
+            kpSlider.value = "1";
+            kiSlider.value = "1";
+            kdSlider.value = "0";
+            setpointSlider.value = "0.5";
+            sensorSlider.value = "2";
+            const comparison = updateSimulation();
+
+            // Check the actual difference during the initial rising portion.
+            const firstRiseIndex = comparison.outputs.findIndex(y => y >= 0.1);
+            if (firstRiseIndex < 0) {
+                result.textContent = "The output did not reach the comparison threshold. Try another test setting.";
+                return;
+            }
+            const trueAtRise = comparison.outputs[firstRiseIndex];
+            const measuredAtRise = comparison.measuredOutputs[firstRiseIndex];
+            const observedLag = firstRiseIndex >= 0 && measuredAtRise < trueAtRise;
+            const correct = prediction.trim() === "lag" && observedLag;
+            result.textContent = (correct ? "Correct! " : "Not quite. ") +
+                (observedLag
+                    ? `At t = ${comparison.times[firstRiseIndex].toFixed(2)} s, the true output is ${trueAtRise.toFixed(3)} while the sensor reports ${measuredAtRise.toFixed(3)}. The sensor lags because it takes time to respond. The PID uses this delayed reading, which can increase overshoot or cause oscillation for some gain settings.`
+                    : "In this run, the chosen initial-rise comparison did not show a measurable lag. Check the graph and try a larger sensor time constant.");
+        }
+
+        const sliders = [kpSlider, kiSlider, kdSlider, setpointSlider, sensorSlider];
+        for (const slider of sliders) {
+            slider.addEventListener("input", updateSimulation);
+        }
+
+        plantSelect.addEventListener("change", updateSimulation);
+        document.getElementById("checkPrediction").addEventListener("click", checkPrediction);
+        updateSimulation();
+    </script>
+</body>
+</html>

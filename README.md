@@ -85,3 +85,27 @@ An interactive web-based toolkit developed for ENCS4380 – Interfacing Techniqu
 
 ChatGPT assisted with code development, explanations, debugging,
 navigation styling and validation checks for P1.
+
+
+## P2 — A Slow Sensor in the Loop
+
+**Owner:** Malak Rabee (1231479)
+
+[Open P2](https://razantartir28.github.io/encs4380-dynamics-BumbleBee/control/p2.html)
+
+- Extended the PID Playground to include a first-order sensor model with an adjustable sensor time constant (τs).
+- Implemented sensor-based feedback, where the PID controller uses the measured output instead of the true plant output.
+- Added a sensor time constant slider (0–3 s) to demonstrate the effects of sensor delay.
+- Displayed the true plant output, measured sensor output, and setpoint on the same live response graph.
+- Supported both first-order and second-order plant models with adjustable PID gains and setpoint.
+- Visualized requested and applied control signals with actuator limits.
+- Displayed response metrics, including steady-state error estimate at 10 s, peak overshoot, rise time, and settling time.
+- Added a closed-loop block diagram illustrating the sensor feedback path.
+- Included an educational explanation of sensor delay, overshoot, and oscillations.
+- Added a **Predict, then check** activity to compare expected and simulated sensor behavior.
+- Validated the simulation using ideal-sensor, slow-sensor, and zero-controller test cases.
+- Updated navigation to integrate P2 into the Control section.
+
+### AI assistance
+
+ChatGPT assisted with code development, sensor modeling, debugging, interface layout, response metric calculations, educational explanations, and simulation validation for P2.

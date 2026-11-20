@@ -109,3 +109,24 @@ navigation styling and validation checks for P1.
 ### AI assistance
 
 ChatGPT assisted with code development, sensor modeling, debugging, interface layout, response metric calculations, educational explanations, and simulation validation for P2.
+
+
+### P3 — Digital PID
+
+**Owner: Dana Abed Alfatah (1231169)**
+
+[Open P3](https://razantartir28.github.io/encs4380-dynamics-BumbleBee/control/p3.html)
+
+- Implemented a discrete-time PID controller with adjustable sampling time (Ts).
+- Added interactive controls for Kp, Ki, Kd, and the setpoint.
+- Simulated the plant using Euler integration and zero-order hold between controller updates.
+- Displayed the output response and compared it with a baseline using Ts = 0.01 s.
+- Visualized the stair-step control signal and actuator saturation limit.
+- Added an anti-windup ON/OFF option using conditional integration.
+- Displayed rise time, overshoot, settling time, and final error.
+- Added a Predict, then check activity to explain the effect of increasing sampling time.
+- Generated Arduino PID loop code using the current controller settings, with a copy button.
+- Tested P-only and PI controller validation cases.
+
+
+

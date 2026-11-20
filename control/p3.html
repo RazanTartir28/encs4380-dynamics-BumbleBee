@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>P3 - Digital PID | BumbleBee</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f3faf6;
+            color: #173d30;
+            line-height: 1.6;
+        }
+
+        .toolkit-header {
+            padding: 38px 24px;
+            color: #fff;
+            background: linear-gradient(120deg, #064e3b, #047857, #059669);
+        }
+
+        .toolkit-container, main {
+            max-width: 1250px;
+            margin: auto;
+        }
+
+        .toolkit-header h1 {
+            margin: 0 0 8px;
+            font-size: clamp(25px, 3vw, 37px);
+        }
+
+        .toolkit-header p {
+            margin: 4px 0;
+            color: #d1fae5;
+        }
+
+        main { padding: 25px 20px 50px; }
+
+        .panel {
+            padding: 16px;
+            background: #fff;
+            border: 1px solid #d1e7db;
+            border-radius: 10px;
+        }
+
+        .panel h2 {
+            margin-top: 0;
+        }
+
+        .controls, #metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+            gap: 12px;
+        }
+
+        .controls label {
+            display: grid;
+            gap: 6px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: #059669;
+        }
+
+        .diagram {
+            margin: 16px 0;
+        }
+
+        .flow {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            padding: 0;
+            list-style: none;
+        }
+
+        .flow li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .flow li + li::before {
+            content: "→";
+            color: #257354;
+        }
+
+        .block {
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid #7caa97;
+            border-radius: 6px;
+        }
+
+        .feedback {
+            border-left: 3px solid #257354;
+            padding-left: 10px;
+        }
+
+        .plot {
+            min-height: 360px;
+            margin: 12px 0;
+        }
+
+        #metrics p {
+            margin: 0;
+        }
+
+        select, button {
+            font: inherit;
+        }
+
+        button {
+            padding: 8px 12px;
+            border: 0;
+            border-radius: 6px;
+            background: #047857;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+<style>
+        .toolkit-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 6px 24px;
+            padding: 14px 20px;
+            background: #064e3b;
+            text-align: center;
+        }
+
+        .toolkit-nav a {
+            max-width: 100%;
+            color: #fff;
+            font: 700 1rem/1.45 "Segoe UI", Arial, sans-serif;
+            text-decoration: none;
+        }
+
+        .toolkit-nav a:hover,
+        .toolkit-nav a[aria-current="page"] {
+            text-decoration: underline;
+            text-underline-offset: 4px;
+        }
+
+        .toolkit-nav a:focus-visible {
+            outline: 2px solid #d1fae5;
+            outline-offset: 3px;
+        }
+    </style>
+<style>
+  .controls {margin-bottom:16px} .stack {display:grid;gap:16px;margin:16px 0}
+  .code-toolbar {display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+  pre {background:#102c26;color:#d1fae5;padding:16px;border-radius:8px;white-space:pre;overflow-x:auto;font-size:13px;line-height:1.55}
+  .note {color:#557366;font-size:.94rem} .result {font-weight:700}
+  .checks {display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .checks label {display:flex;gap:8px;align-items:center}
+  .metric {padding:12px;border:1px solid #d1e7db;border-radius:8px;background:#f7fcf9}
+</style></head><body>
+<header class="toolkit-header"><div class="toolkit-container"><h1>P3 — Digital PID</h1>
+<p>Dynamic Characteristics Interactive Toolkit</p><p>Homework 2 — ENCS4380 Interfacing Techniques</p>
+<p>Birzeit University | BumbleBee</p></div></header>
+<nav class="toolkit-nav" aria-label="Control navigation"><a href="../index.html">← Back to Modules</a><a href="index.html">Control</a><a href="p1.html">P1: PID Playground</a><a href="p2.html">P2: Slow Sensor</a><a href="p3.html" aria-current="page">P3: Digital PID</a></nav>
+<main>
+  <section class="controls panel" aria-label="Controller settings">
+    <label>Plant model<select id="plant"><option value="first">First-order (K=1, τ=1 s)</option><option value="second">Second-order (m=b=k=1)</option></select></label>
+    <label>Sampling time Ts: <output id="tsOut"></output><select id="ts"><option value="0.01">0.01 s</option><option value="0.02">0.02 s</option><option value="0.05">0.05 s</option><option value="0.1" selected>0.10 s</option><option value="0.2">0.20 s</option><option value="0.4">0.40 s</option><option value="0.8">0.80 s</option><option value="1">1.00 s</option></select></label>
+    <label>Proportional gain Kp: <output id="kpOut"></output><input id="kp" type="range" min="0" max="12" value="4" step="0.1"></label>
+    <label>Integral gain Ki: <output id="kiOut"></output><input id="ki" type="range" min="0" max="8" value="3" step="0.1"></label>
+    <label>Derivative gain Kd: <output id="kdOut"></output><input id="kd" type="range" min="0" max="2" value="0.2" step="0.05"></label>
+    <label>Setpoint: <output id="spOut"></output><input id="sp" type="range" min="0.2" max="1.5" value="0.7" step="0.1"></label>
+    <label>Upper control limit<select id="limit"><option value="0.8" selected>0.8 (saturation demo)</option><option value="1">1.0 (100%)</option><option value="10">10 (validation)</option></select></label>
+    <label>Simulation duration<select id="duration"><option value="20" selected>20 s</option><option value="40">40 s</option></select></label>
+    <div class="checks"><label><input id="anti" type="checkbox" checked> Anti-windup enabled</label></div>
+  </section>
+  <section class="panel"><h2>Digital feedback loop</h2><p>Setpoint r → sampled error e[k] → digital PID (every Ts) → saturation → held control u → plant → output y → feedback.</p>
+    <p class="note">The plant is integrated with Euler every 0.002 s. The controller updates only at the selected Ts and holds each command between samples (zero-order hold). Anti-windup uses conditional integration.</p>
+  </section>
+  <div id="responsePlot" class="plot" aria-label="Plant output and setpoint chart"></div>
+  <div id="controlPlot" class="plot" aria-label="Stair-step control signal chart"></div>
+  <section class="panel"><h2>Performance</h2><div id="metrics" aria-live="polite"></div><p class="note">Metrics use the requested setpoint, a 10–90% rise time, and a ±2% settling band. N/A means the result was not established within this simulation window. Dashed comparison: identical settings with Ts = 0.01 s.</p></section>
+  <section class="panel stack"><h2>Predict, then check</h2><p>If all gains stay the same, what is most likely when Ts becomes much larger?</p>
+    <label for="prediction">Your prediction</label><select id="prediction"><option value="">Choose...</option><option value="same">Exactly the same response</option><option value="coarse">Fewer controller updates; possibly poorer stability</option><option value="instant">The plant becomes instantaneous</option></select>
+    <button type="button" id="check">Check prediction</button><p id="predictionResult" role="status"></p></section>
+  <section class="panel"><div class="code-toolbar"><h2>Generated Arduino PID loop</h2><button type="button" id="copy">Copy Arduino code</button></div><p class="note">The generated sketch uses the current gains, Ts, setpoint, saturation, and anti-windup setting. Replace readOutput() with your actual sensor/encoder speed reading, and configure your motor driver as needed.</p>
+  <pre><code id="arduino"></code></pre><p id="copyStatus" role="status"></p></section>
+</main><script src="p3.js"></script></body></html>

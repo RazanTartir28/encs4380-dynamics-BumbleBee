@@ -174,7 +174,9 @@ ChatGPT assisted with code development, sensor modeling, debugging, interface la
 - Generated Arduino PID loop code using the current controller settings, with a copy button.
 - Tested P-only and PI controller validation cases.
 
-   ###AI assistance
+   
+**AI Assistance**
+
   ChatGPT assisted with code development, random plant generation, PID tuning logic, Euler-based simulation, debugging, interface styling, performance metric calculations, scoring system implementation, educational explanations, and validation checks for P4.
 
 

@@ -1,0 +1,609 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My System | BumbleBee</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.6 "Segoe UI",Arial,sans-serif;background:#f3faf6;color:#173d30}
+header{background:linear-gradient(120deg,#064e3b,#047857,#059669);color:white;padding:35px 22px}
+header>div,main{max-width:1150px;margin:auto}
+h1{margin:0}
+nav{background:#064e3b;display:flex;flex-wrap:wrap;justify-content:center;gap:16px;padding:14px}
+nav a{color:white;text-decoration:none;font-weight:700}
+nav a:hover,nav a[aria-current="page"]{text-decoration:underline}
+main{padding:22px 16px 50px}
+.panel{background:white;border:1px solid #d1e7db;border-radius:12px;padding:20px;margin:16px 0}
+.panel h2{margin-top:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:15px}
+label{display:grid;gap:6px;font-weight:600}
+input{width:100%;padding:9px;border:1px solid #a4c5b4;border-radius:7px;font:inherit}
+button{background:#047857;color:white;border:0;border-radius:7px;padding:11px 17px;cursor:pointer;font:inherit;margin:8px 8px 8px 0}
+button:hover{background:#065f46}
+.muted{color:#557366}
+.notice{background:#fff8e7;border-left:5px solid #b7791f;padding:14px;border-radius:5px}
+.metric{background:#f7fcf9;border:1px solid #d1e7db;border-radius:9px;padding:15px}
+.metric output{display:block;font-size:23px;font-weight:700;color:#047857}
+.plot{min-height:350px}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#102d24;color:#e8fff3;border-radius:9px;padding:17px;font-size:12px}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:10px;border-bottom:1px solid #d1e7db}
+th{background:#f1faf5}
+.table-wrap{overflow-x:auto}
+.status{font-weight:600}
+@media(max-width:600px){nav{gap:11px}nav a{font-size:14px}.panel{padding:15px}}
+</style>
+</head>
+
+<body>
+
+<header>
+<div>
+<h1>My System — BumbleBee Motor Speed Control</h1>
+<p>ENCS4380 · Homework 2 · ESP32 + N20 Motor + DRV8833</p>
+</div>
+</header>
+
+<!-- COMPLETE NAVIGATION -->
+<nav aria-label="Control navigation">
+<a href="../index.html">← Back to Modules</a>
+<a href="index.html">Control</a>
+<a href="p1.html">P1: PID Playground</a>
+<a href="p2.html">P2: Slow Sensor</a>
+<a href="p3.html">P3: Digital PID</a>
+<a href="p4.html">P4: Tuning Challenge</a>
+<a href="my-system.html" aria-current="page">My System</a>
+</nav>
+
+<main>
+
+<section class="panel">
+<h2>1. System Overview</h2>
+<p>
+This project applies closed-loop PID speed control to the
+BumbleBee Micromouse robot. An ESP32 calculates the controller
+output, a DRV8833 motor driver applies PWM to an N20 DC gearmotor,
+and a magnetic encoder measures the motor speed.
+</p>
+<p>
+The simulation represents one wheel. The robot uses two motors,
+which can be controlled independently.
+</p>
+
+<div class="notice">
+<strong>DEMO — NOT MEASURED:</strong>
+The motor's advertised voltage and speed are known.
+Plant gain K, time constant τ, encoder resolution and PID gains
+are currently estimated or illustrative. Simulation results
+must not be presented as real experimental measurements.
+</div>
+
+<h3>Hardware Components</h3>
+<div class="table-wrap">
+<table>
+<tr><th>Component</th><th>Specification</th></tr>
+<tr><td>Robot</td><td>BumbleBee Micromouse</td></tr>
+<tr><td>Microcontroller</td><td>ESP32 30-pin Type-C</td></tr>
+<tr><td>Expansion Board</td><td>ESP32 30-pin Expansion Board</td></tr>
+<tr><td>Motor Driver</td><td>DRV8833 Dual H-Bridge (provisional)</td></tr>
+<tr><td>Motor</td><td>N20 DC Gearmotor × 2</td></tr>
+<tr><td>Rated Voltage</td><td>6 V</td></tr>
+<tr><td>Advertised Speed</td><td>530 RPM</td></tr>
+<tr><td>Feedback Sensor</td><td>Magnetic Encoder</td></tr>
+<tr><td>Alternative Driver</td><td>L298N (not selected)</td></tr>
+</table>
+</div>
+</section>
+
+<section class="panel">
+<h2>2. Control System Architecture</h2>
+<p>
+<strong>Target RPM → ESP32 PID → PWM → DRV8833 →
+N20 Motor → Encoder Feedback → ESP32</strong>
+</p>
+<p>
+The encoder measures the actual speed. The controller compares
+the measured RPM with the desired RPM and adjusts the PWM duty
+cycle to reduce the speed error.
+</p>
+</section>
+
+<section class="panel">
+<h2>3. Motor Plant Model</h2>
+<p>
+A first-order approximation is used:
+</p>
+<p><strong>G(s) = K / (τs + 1)</strong></p>
+<p>
+K represents motor speed gain in RPM per percent PWM,
+while τ represents the time constant in seconds.
+</p>
+<p>
+The numerical simulation uses Euler integration:
+</p>
+<p><strong>y[k+1] = y[k] + Δt × (K × u[k] − y[k]) / τ</strong></p>
+
+<div class="grid">
+<label>
+Plant Gain K (RPM / % PWM)
+<input id="K" type="number" value="5.3" min="0.1" max="20" step="0.1">
+</label>
+
+<label>
+Time Constant τ (seconds)
+<input id="tau" type="number" value="0.35" min="0.02" max="5" step="0.01">
+</label>
+
+<label>
+Target Speed (RPM)
+<input id="target" type="number" value="300" min="10" max="530" step="10">
+</label>
+</div>
+
+<p class="muted">
+Demo assumptions: K = 530 / 100 = 5.3 RPM per % PWM,
+assuming 530 RPM at 100% PWM without load.
+τ = 0.35 s is an illustrative value, not a measurement.
+</p>
+</section>
+
+<section class="panel">
+<h2>4. PID Controller</h2>
+<p>
+The controller uses proportional, integral and derivative
+actions with PWM saturation from 0% to 100%.
+Conditional anti-windup limits integral accumulation.
+The derivative acts on measured speed.
+</p>
+
+<div class="grid">
+<label>
+Kp (% PWM / RPM)
+<input id="kp" type="number" value="0.23" min="0" max="10" step="0.01">
+</label>
+
+<label>
+Ki (% PWM / (RPM·s))
+<input id="ki" type="number" value="0.46" min="0" max="20" step="0.01">
+</label>
+
+<label>
+Kd (% PWM·s / RPM)
+<input id="kd" type="number" value="0" min="0" max="5" step="0.001">
+</label>
+</div>
+
+<p>
+For the nominal first-order plant with a PI controller
+(Kd = 0), the closed-loop characteristic equation is:
+</p>
+<p><strong>τs² + (1 + K×Kp)s + K×Ki = 0</strong></p>
+<p>
+The nominal damping ratio is:
+</p>
+<p><strong>ζ = (1 + K×Kp) / (2√(τ×K×Ki))</strong></p>
+<p class="muted">
+This damping-ratio expression applies to the unsaturated
+continuous-time PI model. It is not a general formula for PID
+with nonzero Kd or for saturated behavior.
+</p>
+
+<button id="run">Run Simulation</button>
+<button id="reset">Restore Demo Values</button>
+
+<h3>Performance Results</h3>
+<div class="grid">
+<div class="metric">Estimated Damping Ratio ζ
+<output id="zeta">—</output></div>
+<div class="metric">Overshoot
+<output id="overshoot">—</output></div>
+<div class="metric">Settling Time (±2%)
+<output id="settling">—</output></div>
+<div class="metric">Steady-State Error
+<output id="error">—</output></div>
+</div>
+
+<p id="feedback" class="status" role="status"></p>
+</section>
+
+<section class="panel">
+<h2>5. Motor Speed Response</h2>
+<p>
+The green curve represents the simulated motor speed.
+The dashed line represents the desired speed.
+</p>
+<div id="speedPlot" class="plot" role="img"
+aria-label="Motor speed versus target speed"></div>
+
+<h2>6. Applied PWM Signal</h2>
+<p>
+The PID controller output is constrained between
+0% and 100% PWM duty cycle.
+</p>
+<div id="pwmPlot" class="plot" role="img"
+aria-label="PWM duty cycle versus time"></div>
+</section>
+
+<section class="panel">
+<h2>7. ESP32 Arduino Code</h2>
+<div class="notice">
+<strong>Hardware integration template only.</strong>
+GPIO pins and encoder counts per output-shaft revolution
+are placeholders. Verify the exact DRV8833 module,
+motor supply, encoder voltage, wiring and stall current
+before flashing or connecting hardware.
+</div>
+<p>
+This example demonstrates one-direction speed control
+for one motor using ESP32 Arduino core 3.x.
+The final two-wheel robot requires two encoder channels
+and separate control loops.
+</p>
+<button id="copy">Copy Arduino Code</button>
+<pre id="arduino"></pre>
+</section>
+
+<section class="panel">
+<h2>8. Experimental Identification Plan</h2>
+<p>
+To replace the estimated model with measured values:
+</p>
+<ol>
+<li>Verify the DRV8833 module pinout and safe power supply.</li>
+<li>Determine the encoder counts per output-shaft revolution.</li>
+<li>Apply a known PWM step, such as 0% to 50%.</li>
+<li>Record motor RPM over time using the encoder.</li>
+<li>Estimate K from the steady-state speed change divided by the PWM change.</li>
+<li>Estimate τ from the time required to reach 63.2% of the final speed change.</li>
+<li>Replace the demo values and retune the PID controller.</li>
+<li>Validate the response under the robot's actual load.</li>
+</ol>
+<p class="muted">
+Motor specifications: supplied component listing.
+Driver reference:
+<a href="https://www.ti.com/product/DRV8833" target="_blank" rel="noopener">
+Texas Instruments DRV8833
+</a>.
+</p>
+</section>
+
+<section class="panel">
+<h2>9. Conclusion</h2>
+<p>
+This educational prototype demonstrates closed-loop motor
+speed control for BumbleBee Micromouse using a first-order
+motor model and a PID controller. It provides numerical
+simulation, controller tuning, speed tracking, PWM
+visualization and performance evaluation.
+</p>
+<p>
+The simulated results are preliminary. Experimental
+identification and hardware validation are required
+before the final controller can be considered verified.
+</p>
+</section>
+
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+
+const defaults = {
+  K: 5.3,
+  tau: 0.35,
+  target: 300,
+  kp: 0.23,
+  ki: 0.46,
+  kd: 0
+};
+
+const arduinoCode = `
+// BUMBLEBEE MOTOR SPEED CONTROL
+// DEMONSTRATION TEMPLATE — NOT HARDWARE VALIDATED
+// Verify GPIO pins, encoder CPR and wiring before use.
+// ESP32 Arduino core 3.x
+
+#include <Arduino.h>
+
+const int IN1 = 25;
+const int IN2 = 26;
+const int ENCA = 32;
+
+// PLACEHOLDER: measure actual counts per output revolution.
+const float COUNTS_PER_OUTPUT_REV = 100.0f;
+
+volatile long encoderCount = 0;
+
+void IRAM_ATTR onEncoder() {
+  encoderCount++;
+}
+
+float targetRPM = 300.0f;
+float kp = 0.23f;
+float ki = 0.46f;
+float kd = 0.0f;
+
+float integral = 0.0f;
+float prevRPM = 0.0f;
+
+unsigned long lastMs = 0;
+
+void setup() {
+  Serial.begin(115200);
+
+  pinMode(ENCA, INPUT_PULLUP);
+  attachInterrupt(
+    digitalPinToInterrupt(ENCA),
+    onEncoder,
+    RISING
+  );
+
+  ledcAttach(IN1, 20000, 8);
+
+  pinMode(IN2, OUTPUT);
+  digitalWrite(IN2, LOW);
+
+  lastMs = millis();
+}
+
+void loop() {
+  unsigned long now = millis();
+
+  if (now - lastMs < 50) return;
+
+  float dt = (now - lastMs) / 1000.0f;
+  lastMs = now;
+
+  noInterrupts();
+  long pulses = encoderCount;
+  encoderCount = 0;
+  interrupts();
+
+  float rpm =
+    (pulses / COUNTS_PER_OUTPUT_REV) * 60.0f / dt;
+
+  float error = targetRPM - rpm;
+  float derivative = -(rpm - prevRPM) / dt;
+
+  float candidateIntegral = integral + error * dt;
+
+  float raw =
+    kp * error +
+    ki * candidateIntegral +
+    kd * derivative;
+
+  if (
+    (raw >= 0 && raw <= 100) ||
+    (raw > 100 && error < 0) ||
+    (raw < 0 && error > 0)
+  ) {
+    integral = candidateIntegral;
+  }
+
+  raw =
+    kp * error +
+    ki * integral +
+    kd * derivative;
+
+  float pwm = constrain(raw, 0.0f, 100.0f);
+
+  ledcWrite(
+    IN1,
+    (int)round(pwm * 255.0f / 100.0f)
+  );
+
+  prevRPM = rpm;
+
+  Serial.printf(
+    "Target: %.1f RPM | Actual: %.1f RPM | PWM: %.1f%%\\n",
+    targetRPM,
+    rpm,
+    pwm
+  );
+}
+`;
+
+$("arduino").textContent = arduinoCode.trim();
+
+$("copy").addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(
+      $("arduino").textContent
+    );
+    $("copy").textContent = "Copied!";
+    setTimeout(() => {
+      $("copy").textContent = "Copy Arduino Code";
+    }, 1500);
+  } catch (e) {
+    alert("Please select and copy the code manually.");
+  }
+});
+
+$("reset").addEventListener("click", () => {
+  for (const [key, value] of Object.entries(defaults)) {
+    $(key).value = value;
+  }
+  simulate();
+});
+
+function simulate() {
+  const K = Number($("K").value);
+  const tau = Number($("tau").value);
+  const target = Number($("target").value);
+  const kp = Number($("kp").value);
+  const ki = Number($("ki").value);
+  const kd = Number($("kd").value);
+
+  if (
+    ![K,tau,target,kp,ki,kd].every(Number.isFinite) ||
+    K <= 0 || tau <= 0 || target <= 0 ||
+    kp < 0 || ki < 0 || kd < 0
+  ) {
+    $("feedback").textContent =
+      "Please enter valid plant and PID parameters.";
+    return;
+  }
+
+  const dt = 0.005;
+  const duration = 12;
+  const n = Math.round(duration / dt);
+
+  let y = 0;
+  let integral = 0;
+  let previousY = 0;
+  let peak = 0;
+
+  const times = [];
+  const speeds = [];
+  const pwmValues = [];
+
+  for (let i = 0; i <= n; i++) {
+    const time = i * dt;
+    const error = target - y;
+
+    const derivative = (y - previousY) / dt;
+    const candidateIntegral = integral + error * dt;
+
+    let raw =
+      kp * error +
+      ki * candidateIntegral -
+      kd * derivative;
+
+    if (
+      (raw >= 0 && raw <= 100) ||
+      (raw > 100 && error < 0) ||
+      (raw < 0 && error > 0)
+    ) {
+      integral = candidateIntegral;
+    }
+
+    raw =
+      kp * error +
+      ki * integral -
+      kd * derivative;
+
+    const pwm = Math.max(0, Math.min(100, raw));
+
+    times.push(time);
+    speeds.push(y);
+    pwmValues.push(pwm);
+
+    peak = Math.max(peak, y);
+
+    previousY = y;
+    y += dt * (K * pwm - y) / tau;
+
+    if (!Number.isFinite(y) || Math.abs(y) > 1e7) {
+      $("feedback").textContent =
+        "Numerical instability detected. Reduce PID gains.";
+      return;
+    }
+  }
+
+  const overshoot =
+    Math.max(0, (peak - target) / target * 100);
+
+  let lastOutside = -1;
+
+  for (let i = 0; i < speeds.length; i++) {
+    if (Math.abs(speeds[i] - target) > 0.02 * target) {
+      lastOutside = i;
+    }
+  }
+
+  const settling =
+    lastOutside === speeds.length - 1
+      ? null
+      : (lastOutside + 1) * dt;
+
+  const finalError =
+    Math.abs(target - speeds[speeds.length - 1]) /
+    target * 100;
+
+  const zeta = (ki > 0 && kd === 0)
+    ? (1 + K * kp) / (2 * Math.sqrt(tau * K * ki))
+    : null;
+
+  $("zeta").textContent =
+    zeta === null ? "N/A" : zeta.toFixed(3);
+
+  $("overshoot").textContent =
+    overshoot.toFixed(2) + "%";
+
+  $("settling").textContent =
+    settling === null
+      ? "Not settled"
+      : settling.toFixed(2) + " s";
+
+  $("error").textContent =
+    finalError.toFixed(2) + "%";
+
+  const dampingOK =
+    zeta !== null && zeta >= 0.6 && zeta <= 0.8;
+
+  $("feedback").textContent =
+    (dampingOK
+      ? "Nominal damping ratio is within the 0.6–0.8 target. "
+      : "Nominal damping ratio is outside the target or unavailable. ") +
+    "Results are simulated, not measured.";
+
+  if (typeof Plotly === "undefined") {
+    $("feedback").textContent +=
+      " Plotly could not load. Check your internet connection.";
+    return;
+  }
+
+  const layout = {
+    margin: {t:30,r:20,b:55,l:70},
+    paper_bgcolor: "#ffffff",
+    plot_bgcolor: "#ffffff",
+    xaxis: {title:"Time (seconds)"},
+    yaxis: {title:"Motor Speed (RPM)"},
+    legend: {orientation:"h"}
+  };
+
+  Plotly.react("speedPlot", [
+    {
+      x: times,
+      y: speeds,
+      name: "Simulated Motor RPM",
+      mode: "lines",
+      line: {color:"#047857",width:3}
+    },
+    {
+      x: [0,duration],
+      y: [target,target],
+      name: "Target RPM",
+      mode: "lines",
+      line: {color:"#d97706",dash:"dash",width:2}
+    }
+  ], layout, {responsive:true});
+
+  Plotly.react("pwmPlot", [
+    {
+      x: times,
+      y: pwmValues,
+      name: "PWM Duty (%)",
+      mode: "lines",
+      line: {color:"#047857",width:3}
+    }
+  ], {
+    ...layout,
+    yaxis: {
+      title:"PWM Duty (%)",
+      range:[0,105]
+    }
+  }, {responsive:true});
+}
+
+$("run").addEventListener("click", simulate);
+
+simulate();
+</script>
+
+</body>
+</html>

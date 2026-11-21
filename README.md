@@ -125,6 +125,28 @@ ChatGPT assisted with code development, sensor modeling, debugging, interface la
 - Added an anti-windup ON/OFF option using conditional integration.
 - Displayed rise time, overshoot, settling time, and final error.
 - Added a Predict, then check activity to explain the effect of increasing sampling time.
+
+
+
+## P4 — PID Tuning Challenge
+
+**Owner: Razan Jamal Tartir (1230922)**
+
+[Open P4](https://razantartir28.github.io/encs4380-dynamics-BumbleBee/control/p4.html)
+
+- Implemented an interactive PID tuning challenge using a hidden, randomly generated first-order plant.
+- Added adjustable proportional (Kp), integral (Ki), and derivative (Kd) controller gains.
+- Simulated the closed-loop system using Euler numerical integration.
+- Displayed the system output response and control signal using interactive Plotly graphs.
+- Calculated performance metrics including overshoot, settling time, and steady-state error.
+- Evaluated controller performance against the challenge requirements: overshoot ≤ 10% and steady-state error ≤ 1%, along with the settling-time limit.
+- Implemented a performance scoring system to evaluate the selected PID gains.
+- Added a "New Random Plant" button to generate a different plant for each challenge.
+- Included a "Predict, then check" activity to help users understand the effect of PID tuning.
+- Provided interactive feedback to help users improve controller performance.
+
+
+
 - Generated Arduino PID loop code using the current controller settings, with a copy button.
 - Tested P-only and PI controller validation cases.
 

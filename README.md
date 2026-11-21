@@ -66,6 +66,26 @@ An interactive web-based toolkit developed for ENCS4380 – Interfacing Techniqu
 
 - ## Homework 2 — PID Control Toolkit
 
+- 
+# Homework 2 — PID Control Toolkit
+
+**Team BumbleBee | ENCS4380 — Birzeit University**
+
+### Project Status: Completed and Deployed
+
+The PID Control Toolkit has been implemented and deployed using GitHub Pages. All four interactive modules (P1, P2, P3, and P4) are available through a unified navigation system.
+
+**Live Website:** [Open Homework 2 — PID Control Toolkit](https://razantartir28.github.io/encs4380-dynamics-BumbleBee/control/)
+
+### Available Modules
+
+- [P1 — PID Playground](https://razantartir28.github.io/encs4380-dynamics-BumbleBee/control/p1.html)
+- [P2 — A Slow Sensor in the Loop](https://razantartir28.github.io/encs4380-dynamics-BumbleBee/control/p2.html)
+- [P3 — Digital PID](https://razantartir28.github.io/encs4380-dynamics-BumbleBee/control/p3.html)
+- [P4 — PID Tuning Challenge](https://razantartir28.github.io/encs4380-dynamics-BumbleBee/control/p4.html)
+
+All modules provide interactive control-system simulations, response visualization, and educational activities to demonstrate PID controller behavior.
+
 ### P1 — PID Playground
 
 **Owner:** Suad Jamal (1232045)
@@ -144,9 +164,6 @@ ChatGPT assisted with code development, sensor modeling, debugging, interface la
 - Added a "New Random Plant" button to generate a different plant for each challenge.
 - Included a "Predict, then check" activity to help users understand the effect of PID tuning.
 - Provided interactive feedback to help users improve controller performance.
-
-
-
 - Generated Arduino PID loop code using the current controller settings, with a copy button.
 - Tested P-only and PI controller validation cases.
 

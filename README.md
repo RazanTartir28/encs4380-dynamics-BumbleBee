@@ -126,7 +126,9 @@ navigation styling and validation checks for P1.
 - Validated the simulation using ideal-sensor, slow-sensor, and zero-controller test cases.
 - Updated navigation to integrate P2 into the Control section.
 
-### AI assistance
+
+**AI Assistance**
+
 
 ChatGPT assisted with code development, sensor modeling, debugging, interface layout, response metric calculations, educational explanations, and simulation validation for P2.
 
@@ -146,7 +148,8 @@ ChatGPT assisted with code development, sensor modeling, debugging, interface la
 - Displayed rise time, overshoot, settling time, and final error.
 - Added a Predict, then check activity to explain the effect of increasing sampling time.
 
- ###AI assistance
+
+**AI Assistance**
 
  ChatGPT assisted with code development, discrete-time PID implementation, sampling time analysis, anti-windup logic, debugging, interface layout, response metric calculations, Arduino code generation, and simulation validation for P3.
 

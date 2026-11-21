@@ -146,6 +146,10 @@ ChatGPT assisted with code development, sensor modeling, debugging, interface la
 - Displayed rise time, overshoot, settling time, and final error.
 - Added a Predict, then check activity to explain the effect of increasing sampling time.
 
+ AI assistance
+
+ ChatGPT assisted with code development, discrete-time PID implementation, sampling time analysis, anti-windup logic, debugging, interface layout, response metric calculations, Arduino code generation, and simulation validation for P3.
+
 
 
 ## P4 — PID Tuning Challenge
@@ -166,6 +170,9 @@ ChatGPT assisted with code development, sensor modeling, debugging, interface la
 - Provided interactive feedback to help users improve controller performance.
 - Generated Arduino PID loop code using the current controller settings, with a copy button.
 - Tested P-only and PI controller validation cases.
+
+   AI assistance
+  ChatGPT assisted with code development, random plant generation, PID tuning logic, Euler-based simulation, debugging, interface styling, performance metric calculations, scoring system implementation, educational explanations, and validation checks for P4.
 
 
 

@@ -180,4 +180,48 @@ ChatGPT assisted with code development, sensor modeling, debugging, interface la
   ChatGPT assisted with code development, random plant generation, PID tuning logic, Euler-based simulation, debugging, interface styling, performance metric calculations, scoring system implementation, educational explanations, and validation checks for P4.
 
 
+## My System – BumbleBee Motor Speed Control
 
+### Overview
+
+The **My System** page was developed as an additional interactive module for the ENCS4380 PID Control Toolkit. It demonstrates the application of closed-loop PID control to the BumbleBee Micromouse robot's motor speed control system.
+
+The page connects theoretical control concepts with the hardware components selected for the robot.
+
+### Hardware Components
+
+- **Microcontroller:** ESP32 (30-pin, Type-C)
+- **Motor Driver:** DRV8833 Dual H-Bridge
+- **DC Motors:** N20 DC Gear Motors (6V, 530 RPM)
+- **Feedback:** Magnetic Encoders
+
+### Features and Implementation
+
+The My System page includes:
+
+- A first-order mathematical model of the DC motor.
+- Interactive PID controller tuning using Kp, Ki, and Kd.
+- Motor speed response visualization using Plotly.js.
+- PWM duty-cycle visualization.
+- Performance analysis, including overshoot, settling time, steady-state error, and estimated damping ratio.
+- An ESP32 Arduino code template for motor speed control.
+- An experimental identification plan for future hardware testing.
+- Navigation links connecting My System with P1, P2, P3, and P4.
+
+**Note:** The current motor model uses illustrative parameters. Experimental measurements and hardware validation are planned for future development.
+
+### Developer and Contribution
+
+**Developed by:** Razan Tartir  
+**Student ID:** 1230922  
+**University:** Birzeit University  
+**Course:** ENCS4380 – Interfacing Techniques  
+**Project:** BumbleBee – PID Control Toolkit
+
+**Individual Contribution:** Designed and implemented the My System webpage, including the motor model simulation, PID tuning interface, performance visualization, hardware documentation, and navigation integration with the existing toolkit.
+
+### Access
+
+[Open My System – Live Demo](https://razantartir28.github.io/encs4380-dynamics-BumbleBee/control/my-system.html)
+
+**Source File:** `control/my-system.html`
